@@ -551,6 +551,10 @@
 <span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
   ghcr.io/pglayers/pglayers-full:17
 
+<span class="comment"># Match the open-source extensions available in Azure Database for PostgreSQL</span>
+<span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
+  ghcr.io/pglayers/pglayers-azure:17
+
 <span class="comment"># Or pick your own extensions</span>
 <span class="keyword">FROM</span> postgres:17
 <span class="keyword">COPY --from=</span><span class="string">ghcr.io/pglayers/pgx-pgvector:17</span>  / /
