@@ -533,9 +533,10 @@
         <!-- Hero -->
         <section class="hero">
             <div class="container">
-                <div class="hero-badge">53 extensions and counting</div>
+                <div class="hero-badge">50+ extensions and counting</div>
                 <h1>PostgreSQL extensions<br>as <span class="gradient">stackable layers</span></h1>
                 <p>The official PostgreSQL Docker images include only a handful of ready-to-use extensions. <strong>pglayers</strong> gives you pre-built extensions that stack on top of the official images. No compilers, no dependencies, no waiting.</p>
+                <p>Includes <strong>DocumentDB</strong> for MongoDB wire protocol compatibility, <strong>pgvector</strong> + <strong>pgvectorscale</strong> for AI embeddings, <strong>pg_lake</strong> for Iceberg/data lake access, and much more.</p>
                 <div class="hero-actions">
                     <a href="https://github.com/pglayers/pglayers" class="btn btn-primary">Get Started</a>
                     <a href="#profiles" class="btn btn-secondary">View Profiles</a>
@@ -547,7 +548,7 @@
                         <div class="code-dot green"></div>
                         <span>terminal</span>
                     </div>
-                    <pre><span class="comment"># Ready-to-use: all 53 extensions included</span>
+                    <pre><span class="comment"># Ready-to-use: all 50+ extensions included</span>
 <span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
   ghcr.io/pglayers/pglayers-full:17
 
@@ -635,13 +636,13 @@
                 <p class="section-desc">Pre-configured PostgreSQL images with curated extension sets. Run one command and get a fully-loaded database.</p>
                 <div class="profile-cards">
                     <div class="profile-card">
-                        <div class="profile-badge">29 extensions</div>
+                        <div class="profile-badge">30+ extensions</div>
                         <h3>Azure</h3>
-                        <p class="profile-desc">Extensions matching Azure Database for PostgreSQL Flexible Server. Develop locally with the same extensions available in production.</p>
+                        <p class="profile-desc">Extensions matching Azure Database for PostgreSQL Flexible Server. Includes DocumentDB for MongoDB wire protocol compatibility (same engine as Azure DocumentDB).</p>
                         <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-azure:17</code>
                     </div>
                     <div class="profile-card">
-                        <div class="profile-badge">53 extensions</div>
+                        <div class="profile-badge">50+ extensions</div>
                         <h3>Full</h3>
                         <p class="profile-desc">Every extension pglayers provides. The complete toolkit for development, testing, and experimentation.</p>
                         <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-full:17</code>
