@@ -34,6 +34,9 @@ no static site generator, no external packages.
 - When modifying an existing blog post, always update the corresponding
   `<content:encoded>` in `feed.xml` to match. The HTML post and the RSS
   entry must stay in sync.
+- The `<content:encoded>` in `feed.xml` must always contain the **full
+  post content as HTML** (not a summary or plain text) so it renders
+  correctly in RSS news readers.
 
 ## File structure
 
