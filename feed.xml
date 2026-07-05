@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>pglayers blog</title>
+    <link>https://pglayers.github.io/blog/</link>
+    <description>Updates, guides, and announcements from the pglayers project.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 05 Jul 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Introducing pglayers</title>
+      <link>https://pglayers.github.io/blog/2025-07-05-introducing-pglayers.html</link>
+      <guid>https://pglayers.github.io/blog/2025-07-05-introducing-pglayers.html</guid>
+      <pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate>
+      <description>50+ pre-built PostgreSQL extensions as stackable Docker layers. No compilation, no third-party images -- just COPY --from and go.</description>
+      <content:encoded><![CDATA[
+<p>
+  The <a href="https://hub.docker.com/_/postgres">official PostgreSQL Docker images</a>
+  are great -- they're well-maintained, secure, and reliable. But they ship
+  with almost no extensions. If you need <strong>pgvector</strong> for AI embeddings,
+  <strong>PostGIS</strong> for geospatial queries, or <strong>pg_cron</strong> for
+  scheduled jobs, you're on your own: installing compilers, resolving
+  dependencies, building from source, or trusting a third-party image that
+  bundles a fixed set you can't change.
+</p>
+
+<p>
+  <strong>pglayers</strong> fixes this. It gives you 50+ pre-built PostgreSQL
+  extensions as stackable Docker image layers. You add one line per extension
+  to your Dockerfile -- no compilation, no package managers, no build tools.
+</p>
+
+<h2>The problem</h2>
+
+<p>
+  Suppose you want PostgreSQL with pgvector and pg_cron. Today your options are:
+</p>
+
+<ol>
+  <li><strong>Build from source.</strong> Install <code>build-essential</code>,
+    <code>postgresql-server-dev-17</code>, clone the repos, run
+    <code>make install</code>. Repeat every time you upgrade. Slow, fragile,
+    and bloats your image with compilers you don't need at runtime.</li>
+  <li><strong>Use a third-party image.</strong> Someone else built an image with
+    a particular set of extensions. Maybe it includes what you need, maybe it
+    doesn't. You lose control over the base image, update schedule, and
+    security patches.</li>
+  <li><strong>PGDG packages.</strong> Install from <code>apt.postgresql.org</code>.
+    Works, but the package manager pulls transitive dependencies, and you're
+    mixing package management with Docker layer caching in ways that complicate
+    reproducibility.</li>
+</ol>
+
+<p>
+  None of these compose well. If you need pgvector <em>and</em> PostGIS
+  <em>and</em> TimescaleDB <em>and</em> pg_cron, each approach compounds its
+  complexity.
+</p>
+
+<h2>How pglayers works</h2>
+
+<p>
+  Each extension is published as a minimal Docker image (built <code>FROM scratch</code>)
+  containing only the extension's compiled binaries: the <code>.so</code> shared
+  library, the <code>.control</code> file, and the SQL migration scripts. These
+  files are laid out at exactly the paths PostgreSQL expects:
+</p>
+
+<pre><code>/usr/lib/postgresql/17/lib/vector.so
+/usr/share/postgresql/17/extension/vector.control
+/usr/share/postgresql/17/extension/vector--0.8.3.sql</code></pre>
+
+<p>
+  To use them, you write a standard multi-stage <code>COPY --from</code> in your
+  Dockerfile:
+</p>
+
+<pre><code>FROM postgres:17
+
+COPY --from=ghcr.io/pglayers/pgx-pgvector:17  / /
+COPY --from=ghcr.io/pglayers/pgx-pg_cron:17   / /
+COPY --from=ghcr.io/pglayers/pgx-postgis:17   / /</code></pre>
+
+<p>
+  That's it. Docker pulls the pre-built layers from the registry and overlays
+  them onto the official image. No compilation happens at build time -- it's
+  just file copies. The result is a single image with exactly the extensions
+  you chose.
+</p>
+
+<p>Then you can <code>CREATE EXTENSION</code> as usual:</p>
+
+<pre><code>CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+CREATE EXTENSION IF NOT EXISTS postgis;</code></pre>
+
+<h2>Ready-to-use profile images</h2>
+
+<p>
+  If you don't want to pick individual extensions, pglayers provides pre-built
+  combined images called <strong>profiles</strong>:
+</p>
+
+<pre><code># All 50+ extensions, pre-configured
+docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-full:17
+
+# Extensions matching Azure Database for PostgreSQL
+docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:17</code></pre>
+
+<p>
+  Profile images come with <code>shared_preload_libraries</code> already
+  configured, companion processes started (like pg_lake's DuckDB backend),
+  and all the GUC settings extensions need. Just <code>docker run</code> and
+  you have a fully-loaded PostgreSQL instance.
+</p>
+
+<p>
+  The <strong>azure</strong> profile also includes <strong>DocumentDB</strong>,
+  which provides MongoDB wire protocol compatibility on port 10260. MongoDB
+  clients (mongosh, pymongo, the Node.js driver) connect directly -- same
+  engine as Azure DocumentDB.
+</p>
+
+<h2>What's included</h2>
+
+<p>
+  pglayers ships 53 extensions across PostgreSQL 17, 18, and 19. A few
+  highlights:
+</p>
+
+<ul>
+  <li><strong>pgvector + pgvectorscale</strong> -- vector similarity search for
+    AI/ML embeddings, with high-performance DiskANN indexing</li>
+  <li><strong>PostGIS + pgRouting</strong> -- the full geospatial stack
+    (geometry, geography, raster, routing)</li>
+  <li><strong>TimescaleDB</strong> -- hypertables, compression, and continuous
+    aggregates for time-series data</li>
+  <li><strong>pg_cron</strong> -- cron-like job scheduler running inside the
+    database</li>
+  <li><strong>DocumentDB</strong> -- MongoDB-compatible document engine with
+    wire protocol support</li>
+  <li><strong>pg_lake</strong> -- query Iceberg tables and data lake files
+    (Parquet, CSV, JSON) directly from PostgreSQL</li>
+  <li><strong>pg_duckdb</strong> -- DuckDB's columnar analytics engine embedded
+    in Postgres for OLAP workloads</li>
+  <li><strong>Apache AGE</strong> -- graph database with openCypher query
+    support</li>
+</ul>
+
+<p>
+  All images are multi-architecture (linux/amd64 and linux/arm64), so Docker
+  automatically pulls the right binary for your platform -- whether you're on
+  an M-series Mac or an x86 CI runner.
+</p>
+
+<h2>Quality guarantees</h2>
+
+<p>
+  Every extension goes through a CI pipeline that checks:
+</p>
+
+<ul>
+  <li><strong>No file collisions</strong> -- extension pairs are compared to
+    ensure they don't overwrite each other's files</li>
+  <li><strong>No base image overwrites</strong> -- extensions never replace
+    files from the official postgres image</li>
+  <li><strong>Shared library resolution</strong> -- <code>ldd</code> verifies
+    all transitive dependencies are present</li>
+  <li><strong>CREATE EXTENSION</strong> -- every extension loads successfully</li>
+  <li><strong>Functional smoke tests</strong> -- each extension is exercised
+    with real queries, not just loaded</li>
+</ul>
+
+<h2>Getting started</h2>
+
+<p>
+  The fastest way to try pglayers is the full profile image:
+</p>
+
+<pre><code>docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret \
+  ghcr.io/pglayers/pglayers-full:17</code></pre>
+
+<p>
+  Then connect and enable any extension:
+</p>
+
+<pre><code>psql -h localhost -U postgres
+CREATE EXTENSION vector;
+CREATE EXTENSION postgis;
+SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+
+<p>
+  To build a custom image with only the extensions you need, create a
+  Dockerfile:
+</p>
+
+<pre><code>FROM postgres:17
+
+COPY --from=ghcr.io/pglayers/pgx-pgvector:17       / /
+COPY --from=ghcr.io/pglayers/pgx-timescaledb:17    / /
+COPY --from=ghcr.io/pglayers/pgx-pg_cron:17        / /
+
+RUN echo "shared_preload_libraries = 'timescaledb,pg_cron'" \
+    >> /usr/share/postgresql/postgresql.conf.sample</code></pre>
+
+<p>
+  Build and run:
+</p>
+
+<pre><code>docker build -t my-postgres .
+docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret my-postgres</code></pre>
+
+<h2>Open source</h2>
+
+<p>
+  pglayers is MIT licensed and hosted on GitHub. The project welcomes
+  contributions -- whether that's adding a new extension, improving tests, or
+  reporting issues.
+</p>
+
+<p>
+  <a href="https://github.com/pglayers/pglayers">github.com/pglayers/pglayers</a>
+</p>
+
+<blockquote>
+  <p>
+    pglayers stands on the shoulders of the PostgreSQL community: the
+    PostgreSQL Global Development Group, the PGDG APT repository maintainers,
+    the official Docker image maintainers, and every extension author who
+    releases their work under permissive open-source licenses.
+  </p>
+</blockquote>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

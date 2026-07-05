@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - pglayers</title>
+    <meta name="description" content="Updates, guides, and announcements from the pglayers project.">
+    <link rel="alternate" type="application/rss+xml" title="pglayers blog" href="/feed.xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-card: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e4e4ed;
+            --text-muted: #8888a0;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --green: #10b981;
+            --blue: #3b82f6;
+            --orange: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-brand span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-links .btn-gh {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .nav-links .btn-gh:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Blog listing */
+        .blog-container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .blog-container h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .blog-intro {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .blog-intro a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        .post-list {
+            list-style: none;
+        }
+
+        .post-item {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .post-item:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .post-item a {
+            text-decoration: none;
+        }
+
+        .post-item h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+            transition: color 0.2s;
+        }
+
+        .post-item a:hover h2 {
+            color: var(--accent-light);
+        }
+
+        .post-item time {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .post-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { gap: 1rem; }
+            .blog-container { padding: 7rem 1.25rem 3rem; }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links a:not(.btn-gh) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand"><span>pglayers</span></a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#profiles">Profiles</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/pglayers/pglayers" class="btn-gh">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+
+    <main class="blog-container">
+        <h1>Blog</h1>
+        <p class="blog-intro">
+            Updates, guides, and announcements from the pglayers project.
+            <a href="/feed.xml">RSS feed</a>
+        </p>
+
+        <ul class="post-list">
+            <li class="post-item">
+                <a href="/blog/2025-07-05-introducing-pglayers.html">
+                    <h2>Introducing pglayers</h2>
+                    <time datetime="2025-07-05">July 5, 2025</time>
+                    <p>50+ pre-built PostgreSQL extensions as stackable Docker layers. No compilation, no third-party images -- just COPY --from and go.</p>
+                </a>
+            </li>
+        </ul>
+    </main>
+
+    <footer>
+        <p>pglayers is open source under the <a href="https://github.com/pglayers/pglayers/blob/main/LICENSE">MIT License</a>.</p>
+    </footer>
+</body>
+</html>
