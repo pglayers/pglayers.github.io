@@ -27,6 +27,14 @@ no static site generator, no external packages.
 - Individual posts: `blog/YYYY-MM-DD-slug.html`
 - RSS feed: `feed.xml` (Atom or RSS 2.0, kept at repo root)
 - Each post must include: title, date, author, and content.
+- **Dates must be 2026-07 or later** and should correspond to the
+  current date at time of writing. The feed is syndicated to
+  Planet PostgreSQL, which ignores posts with dates in the past.
+  Never use placeholder or outdated years in `<pubDate>`,
+  `<lastBuildDate>`, filenames, or `<time>` elements.
+- **Every post in `feed.xml` must include these three `<category>` elements:**
+  `PostgreSQL`, `Docker`, `Containers`. Planet PostgreSQL filters by
+  category tags; omitting them may prevent syndication.
 - When adding a new blog post:
   1. Create the post HTML file in `blog/`
   2. Add an entry to `blog/index.html`

@@ -5,14 +5,17 @@
     <link>https://pglayers.github.io/blog/</link>
     <description>Updates, guides, and announcements from the pglayers project.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 05 Jul 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 05 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
       <title>Introducing pglayers</title>
-      <link>https://pglayers.github.io/blog/2025-07-05-introducing-pglayers.html</link>
-      <guid>https://pglayers.github.io/blog/2025-07-05-introducing-pglayers.html</guid>
-      <pubDate>Sat, 05 Jul 2025 00:00:00 +0000</pubDate>
+      <link>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</link>
+      <guid>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</guid>
+      <pubDate>Sat, 05 Jul 2026 00:00:00 +0000</pubDate>
+      <category>PostgreSQL</category>
+      <category>Docker</category>
+      <category>Containers</category>
       <description>50+ pre-built PostgreSQL extensions as stackable Docker layers. No compilation, no third-party images -- just COPY --from and go.</description>
       <content:encoded><![CDATA[
 <p>
