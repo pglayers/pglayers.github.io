@@ -522,6 +522,7 @@
         <a href="/" class="nav-brand"><span>pglayers</span></a>
         <div class="nav-links">
             <a href="#features">Features</a>
+            <a href="#kubernetes">Kubernetes</a>
             <a href="#profiles">Profiles</a>
             <a href="/blog/">Blog</a>
             <a href="https://github.com/pglayers/pglayers" class="btn-gh">
@@ -650,6 +651,66 @@
                         <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-full:17</code>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Kubernetes -->
+        <section class="features" id="kubernetes" style="padding-top: 4rem;">
+            <div class="container">
+                <div class="section-label">Kubernetes Native</div>
+                <h2 class="section-title">Runtime extensions via ImageVolumes</h2>
+                <p class="section-desc">PostgreSQL 18 introduced <code style="background:var(--bg-card);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.9em;">extension_control_path</code> -- and pglayers takes full advantage. Mount extensions at deploy time with zero image rebuilds.</p>
+                <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x2638;</div>
+                        <h3>Kubernetes ImageVolumes</h3>
+                        <p>Each extension image mounts as a read-only volume at <code>/extensions/&lt;name&gt;/</code>. Add or remove extensions by changing Pod volumes -- no image rebuild needed.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x1F4CB;</div>
+                        <h3>CloudNativePG Compatible</h3>
+                        <p>Images use the CNPG-standard layout (<code>/lib/</code> + <code>/share/extension/</code>). Generate a <code>ClusterImageCatalog</code> with one command and let the operator handle the rest.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x1F3F7;</div>
+                        <h3>OCI Labels for Discovery</h3>
+                        <p>Every image includes standard OCI labels (name, version, license, PG version) for machine-readable discovery via registry APIs or <code>docker inspect</code>.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x1F6E1;</div>
+                        <h3>Zero Collision Risk</h3>
+                        <p>Each extension lives in its own namespace. Two extensions can bundle different versions of the same library without conflict -- collisions are structurally impossible.</p>
+                    </div>
+                </div>
+                <div class="hero-code" style="margin-top: 3rem;">
+                    <div class="code-header">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                        <span>pod.yaml</span>
+                    </div>
+                    <pre><span class="comment"># Stock postgres:18 + extensions as Kubernetes ImageVolumes</span>
+<span class="comment"># No custom image build required</span>
+<span class="keyword">apiVersion:</span> v1
+<span class="keyword">kind:</span> Pod
+<span class="keyword">spec:</span>
+  <span class="keyword">volumes:</span>
+    - <span class="keyword">name:</span> ext-pgvector
+      <span class="keyword">image:</span>
+        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-pgvector:18-0.8.4</span>
+    - <span class="keyword">name:</span> ext-postgis
+      <span class="keyword">image:</span>
+        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-postgis:18-3.6.4</span>
+  <span class="keyword">containers:</span>
+    - <span class="keyword">image:</span> <span class="string">postgres:18</span>
+      <span class="keyword">args:</span> [<span class="string">"postgres"</span>, <span class="string">"-c"</span>, <span class="string">"extension_control_path=...$$system"</span>]
+      <span class="keyword">volumeMounts:</span>
+        - <span class="keyword">name:</span> ext-pgvector
+          <span class="keyword">mountPath:</span> <span class="string">/extensions/pgvector</span>
+        - <span class="keyword">name:</span> ext-postgis
+          <span class="keyword">mountPath:</span> <span class="string">/extensions/postgis</span></pre>
+                </div>
+                <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem; text-align: center;">Requires PostgreSQL 18+ and Kubernetes 1.33+. Works with any orchestrator -- CNPG, plain Deployments, StatefulSets, or Helm charts.</p>
             </div>
         </section>
 
