@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>pglayers blog</title>
     <link>https://pglayers.github.io/blog/</link>
-    <description>Updates, guides, and announcements from the pglayers project.</description>
+    <description>Updates, guides, and announcements from the pglayers project -- by Ismaël Mejía (@iemejia).</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 05 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <managingEditor>iemejia@gmail.com (Ismaël Mejía)</managingEditor>
+    <lastBuildDate>Mon, 06 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
       <title>Introducing pglayers</title>
       <link>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</link>
       <guid>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</guid>
-      <pubDate>Sat, 05 Jul 2026 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 05 Jul 2026 00:00:00 +0000</pubDate>
+      <dc:creator>Ismaël Mejía</dc:creator>
       <category>PostgreSQL</category>
       <category>Docker</category>
       <category>Containers</category>

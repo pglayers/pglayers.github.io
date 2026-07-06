@@ -27,6 +27,13 @@ no static site generator, no external packages.
 - Individual posts: `blog/YYYY-MM-DD-slug.html`
 - RSS feed: `feed.xml` (Atom or RSS 2.0, kept at repo root)
 - Each post must include: title, date, author, and content.
+- **Author is always Ismaël Mejía (@iemejia).** Planet PostgreSQL
+  requires individual authorship -- never use a team or project name.
+  The author must appear in:
+  - The blog post HTML (`.article-meta .author` element)
+  - The blog index listing (`blog/index.html`)
+  - The RSS feed channel (`<managingEditor>` and `<description>`)
+  - Each RSS feed item (`<dc:creator>`)
 - **Dates must be 2026-07 or later** and should correspond to the
   current date at time of writing. The feed is syndicated to
   Planet PostgreSQL, which ignores posts with dates in the past.
