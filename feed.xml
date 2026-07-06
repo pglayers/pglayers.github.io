@@ -3,9 +3,9 @@
   <channel>
     <title>pglayers blog</title>
     <link>https://pglayers.github.io/blog/</link>
-    <description>Updates, guides, and announcements from the pglayers project -- by Ismaël Mejía (@iemejia).</description>
+    <description>Updates, guides, and announcements from the pglayers project -- by Ismaël Mejía &lt;iemejia@gmail.com&gt;.</description>
     <language>en-us</language>
-    <managingEditor>iemejia@gmail.com (Ismaël Mejía)</managingEditor>
+    <managingEditor>Ismaël Mejía &lt;iemejia@gmail.com&gt;</managingEditor>
     <lastBuildDate>Mon, 06 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
@@ -14,7 +14,7 @@
       <link>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</link>
       <guid>https://pglayers.github.io/blog/2026-07-05-introducing-pglayers.html</guid>
       <pubDate>Sun, 05 Jul 2026 00:00:00 +0000</pubDate>
-      <dc:creator>Ismaël Mejía</dc:creator>
+      <dc:creator>Ismaël Mejía &lt;iemejia@gmail.com&gt;</dc:creator>
       <category>PostgreSQL</category>
       <category>Docker</category>
       <category>Containers</category>
