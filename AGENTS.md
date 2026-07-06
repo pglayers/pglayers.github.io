@@ -18,6 +18,10 @@ no static site generator, no external packages.
 - **Consistent styling.** Blog pages reuse the same design language as
   `index.html` (dark theme, Inter + JetBrains Mono fonts, CSS variables
   defined in `:root`).
+- **Navigation bar must stay in sync across all pages.** The top nav is
+  duplicated in `index.html`, `blog/index.html`, and every blog post.
+  When changing nav links (adding, removing, or reordering), update all
+  pages together.
 - **Audience.** Technical but beginner-friendly. Assume readers know
   Docker and PostgreSQL basics but explain pglayers-specific concepts.
 
