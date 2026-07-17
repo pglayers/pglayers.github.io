@@ -536,7 +536,7 @@
         <!-- Hero -->
         <section class="hero">
             <div class="container">
-                <div class="hero-badge">50+ extensions and counting</div>
+                <div class="hero-badge">80+ extensions and counting</div>
                 <h1>PostgreSQL extensions<br>as <span class="gradient">stackable layers</span></h1>
                 <p>The official PostgreSQL Docker images include only a handful of ready-to-use extensions. <strong>pglayers</strong> gives you pre-built extensions that stack on top of the official images. No compilers, no dependencies, no waiting.</p>
                 <p>Includes <strong>DocumentDB</strong> for MongoDB wire protocol compatibility, <strong>pgvector</strong> + <strong>pgvectorscale</strong> for AI embeddings, <strong>pg_lake</strong> for Iceberg/data lake access, and much more.</p>
@@ -551,7 +551,7 @@
                         <div class="code-dot green"></div>
                         <span>terminal</span>
                     </div>
-                    <pre><span class="comment"># Ready-to-use: all 50+ extensions included</span>
+                    <pre><span class="comment"># Ready-to-use: all 80+ extensions included</span>
 <span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
   ghcr.io/pglayers/pglayers-full:17
 
@@ -645,7 +645,7 @@
                         <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-azure:17</code>
                     </div>
                     <div class="profile-card">
-                        <div class="profile-badge">50+ extensions</div>
+                        <div class="profile-badge">80+ extensions</div>
                         <h3>Full</h3>
                         <p class="profile-desc">Every extension pglayers provides. The complete toolkit for development, testing, and experimentation.</p>
                         <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-full:17</code>
@@ -697,7 +697,7 @@
   <span class="keyword">volumes:</span>
     - <span class="keyword">name:</span> ext-pgvector
       <span class="keyword">image:</span>
-        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-pgvector:18-0.8.4</span>
+        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-pgvector:18-0.8.5</span>
     - <span class="keyword">name:</span> ext-postgis
       <span class="keyword">image:</span>
         <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-postgis:18-3.6.4</span>
