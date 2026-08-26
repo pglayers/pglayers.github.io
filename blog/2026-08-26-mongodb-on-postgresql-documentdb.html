@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB on PostgreSQL: DocumentDB with pglayers-azure - pglayers blog</title>
+    <meta name="description" content="Run the pglayers-azure image, enable the MongoDB-compatible DocumentDB extension, and connect from mongosh or pymongo over the MongoDB wire protocol.">
+    <link rel="alternate" type="application/rss+xml" title="pglayers blog" href="/feed.xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-card: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e4e4ed;
+            --text-muted: #8888a0;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --green: #10b981;
+            --blue: #3b82f6;
+            --orange: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-brand span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-links .btn-gh {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .nav-links .btn-gh:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Article layout */
+        .article-container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .article-meta {
+            margin-bottom: 2rem;
+        }
+
+        .article-meta time {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .article-meta .author {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .article-container h1 {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .article-container h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .article-container h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem;
+        }
+
+        .article-container p {
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .article-container a {
+            color: var(--accent-light);
+            text-decoration: underline;
+            text-decoration-color: rgba(129, 140, 248, 0.3);
+            text-underline-offset: 3px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .article-container a:hover {
+            text-decoration-color: var(--accent-light);
+        }
+
+        .article-container ul,
+        .article-container ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        .article-container li {
+            margin-bottom: 0.5rem;
+            line-height: 1.7;
+        }
+
+        .article-container code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+        }
+
+        .article-container pre {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .article-container pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        .article-container blockquote {
+            margin: 1.5rem 0;
+            padding: 1rem 1.5rem;
+            border-left: 3px solid var(--accent);
+            background: var(--accent-glow);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .article-container blockquote p {
+            margin-bottom: 0;
+            color: var(--text-muted);
+        }
+
+        .article-container strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { gap: 1rem; }
+            .article-container { padding: 7rem 1.25rem 3rem; }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links a:not(.btn-gh) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand"><span>pglayers</span></a>
+        <div class="nav-links">
+            <a href="/#features">Features</a>
+            <a href="/#profiles">Profiles</a>
+            <a href="/#kubernetes">Kubernetes</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/pglayers/pglayers" class="btn-gh">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+
+    <article class="article-container">
+        <div class="article-meta">
+            <time datetime="2026-08-26">August 26, 2026</time>
+            &middot;
+            <span class="author">Ismaël Mejía (<a href="https://github.com/iemejia">@iemejia</a>)</span>
+        </div>
+
+        <h1>MongoDB on PostgreSQL: DocumentDB with pglayers-azure</h1>
+
+        <p>
+            <a href="https://github.com/documentdb/documentdb">DocumentDB</a> is a
+            MongoDB-compatible document database built on PostgreSQL. It adds the
+            <strong>BSON</strong> data type and a full CRUD API to Postgres, and ships a
+            gateway that speaks the <strong>MongoDB wire protocol</strong> -- so existing
+            MongoDB clients (<code>mongosh</code>, <code>pymongo</code>, the Node.js
+            driver) can connect to a PostgreSQL server as if it were MongoDB. It's the
+            same engine behind Azure DocumentDB.
+        </p>
+
+        <p>
+            DocumentDB is included in the <strong>pglayers-azure</strong> profile image,
+            which mirrors the open-source extensions available in Azure Database for
+            PostgreSQL. This post walks through running the image and talking to it from a
+            MongoDB client end to end -- including a password gotcha that trips people up.
+        </p>
+
+        <h2>1. Start the container</h2>
+
+        <p>
+            Run the <code>pglayers-azure</code> image, exposing PostgreSQL on 5432 and the
+            DocumentDB gateway on <strong>10260</strong> (the port the wire protocol
+            listens on):
+        </p>
+
+        <pre><code>docker run -d --name pglayers-docdb \
+  -e POSTGRES_PASSWORD=secret \
+  -p 5432:5432 -p 10260:10260 \
+  ghcr.io/pglayers/pglayers-azure:18</code></pre>
+
+        <p>
+            The profile image auto-configures everything at boot: it sets
+            <code>shared_preload_libraries</code> (including
+            <code>pg_documentdb_gw_host</code>, the gateway worker), appends the required
+            GUCs, and <strong>auto-creates the <code>documentdb</code> extension</strong>
+            on first init. Within a second or two the log shows
+            <code>TCP listener(s) bound to port 10260</code> and the gateway is ready.
+            You don't need to run <code>CREATE EXTENSION</code> yourself.
+        </p>
+
+        <blockquote>
+            <p>
+                Use <strong>PG 18</strong> (isolated layout) or PG 17. DocumentDB is built
+                only for 17 and 18 -- not 19 -- so don't use
+                <code>pglayers-azure:19</code> for this.
+            </p>
+        </blockquote>
+
+        <h2>2. Create a MongoDB user</h2>
+
+        <p>
+            The gateway uses native SCRAM authentication, and its configuration blocks a
+            set of role name prefixes (<code>documentdb</code>, <code>citus</code>,
+            <code>pg</code>, <code>internal_role</code>). That means you can't reuse the
+            <code>postgres</code> superuser -- you need a fresh role with a password.
+        </p>
+
+        <p>
+            The intuitive approach is DocumentDB's own
+            <code>documentdb_api.create_user()</code> function, but on a stock image it
+            fails:
+        </p>
+
+        <pre><code>ERROR:  password type is not a plain text
+CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</code></pre>
+
+        <p>
+            The reason: the server runs with
+            <code>password_encryption = scram-sha-256</code>, so
+            <code>create_user()</code> pre-hashes the password, but DocumentDB installs a
+            <code>check_password</code> hook that wants the <strong>plaintext</strong>
+            value (it builds the SCRAM verifier itself). The two disagree and the call is
+            rejected.
+        </p>
+
+        <p>
+            The path that works is a direct <code>CREATE ROLE</code> with a plaintext
+            password, granting DocumentDB's built-in roles. The hook then computes the
+            verifier the gateway expects:
+        </p>
+
+        <pre><code>docker exec pglayers-docdb psql -U postgres -c \
+  "CREATE ROLE mongoadmin WITH LOGIN INHERIT PASSWORD 'Secret_123' \
+   IN ROLE documentdb_admin_role, documentdb_readonly_role;"</code></pre>
+
+        <blockquote>
+            <p>
+                Upstream's standalone <code>documentdb-local</code> image sidesteps this
+                by taking <code>--username</code>/<code>--password</code> at container
+                start and bootstrapping the first user itself. In pglayers the gateway
+                runs as a PostgreSQL background worker, so you create the user via SQL as
+                above.
+            </p>
+        </blockquote>
+
+        <h2>3. Connect from a MongoDB client</h2>
+
+        <p>
+            The gateway serves TLS with an auto-generated self-signed certificate, so
+            clients connect with TLS enabled and certificate validation relaxed. The
+            connection string is:
+        </p>
+
+        <pre><code>mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256</code></pre>
+
+        <p>
+            Here's a full round-trip with <code>mongosh</code> (run from a throwaway
+            container on the host network) -- insert, filtered find, and an aggregation:
+        </p>
+
+        <pre><code>docker run --rm --network host mongodb/mongodb-community-server:latest mongosh --quiet \
+  "mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256" \
+  --eval 'const db = db.getSiblingDB("shop");
+          db.products.insertMany([{name:"Widget",price:9.99},{name:"Gadget",price:19.5}]);
+          printjson(db.products.find({price:{$gte:10}}).toArray());
+          printjson(db.products.aggregate([{$group:{_id:null,avg:{$avg:"$price"}}}]).toArray());'</code></pre>
+
+        <p>
+            This inserts two documents, returns <code>Gadget</code> for the
+            <code>$gte</code> filter, and computes an average price of
+            <code>14.745</code>. The exact same URI works from
+            <code>pymongo</code> or the Node.js driver:
+        </p>
+
+        <pre><code>from pymongo import MongoClient
+
+client = MongoClient(
+    "mongodb://mongoadmin:Secret_123@localhost:10260/"
+    "?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"
+)
+db = client["shop"]
+db.products.insert_one({"name": "Sprocket", "price": 4.5})
+print(db.products.find_one({"name": "Sprocket"}))</code></pre>
+
+        <p>
+            Because it's all PostgreSQL underneath, the same data is queryable from SQL --
+            for example via <code>documentdb_api.count_query('shop', ...)</code> -- so you
+            can mix document workloads and relational queries against one database.
+        </p>
+
+        <h2>Production notes</h2>
+
+        <ul>
+            <li><strong>TLS.</strong> <code>tlsAllowInvalidCertificates=true</code> is only
+                appropriate for the bundled self-signed certificate. For production, mount
+                your own certificate and a custom
+                <code>/etc/documentdb/gateway_config.json</code> to set the port, TLS mode,
+                and blocked role prefixes.</li>
+            <li><strong>PostgreSQL version.</strong> Stick to PG 17 or 18; DocumentDB isn't
+                built for 19 yet.</li>
+            <li><strong>Auto-created extensions.</strong> The gateway needs the
+                <code>documentdb</code> extension to exist, which the profile image creates
+                for you on first init. To opt out, set
+                <code>PGLAYERS_CREATE_EXTENSIONS=none</code>.</li>
+        </ul>
+
+        <h2>Try it</h2>
+
+        <p>
+            Everything above is a single <code>docker run</code> plus one
+            <code>CREATE ROLE</code> away. Pull the image and connect your favorite MongoDB
+            client:
+        </p>
+
+        <pre><code>docker run -d -p 5432:5432 -p 10260:10260 \
+  -e POSTGRES_PASSWORD=secret \
+  ghcr.io/pglayers/pglayers-azure:18</code></pre>
+
+        <p>
+            See the <a href="https://github.com/pglayers/pglayers">pglayers repository</a>
+            for the full extension list and profile documentation, and the
+            <a href="https://github.com/documentdb/documentdb">DocumentDB project</a> for
+            the supported MongoDB API surface.
+        </p>
+    </article>
+
+    <footer>
+        <p>pglayers is open source under the <a href="https://github.com/pglayers/pglayers/blob/main/LICENSE">MIT License</a>.</p>
+    </footer>
+</body>
+</html>
