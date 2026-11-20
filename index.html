@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pglayers - PostgreSQL Extensions as Docker Layers</title>
-    <meta name="description" content="Pre-built PostgreSQL extensions as stackable Docker layers. Compose what you need on top of official images, no compilation.">
+    <meta name="description" content="84 pre-built PostgreSQL extensions as stackable Docker layers for PostgreSQL 17, 18, and 19. Ready-to-use full and Azure profiles for amd64 and arm64.">
     <link rel="alternate" type="application/rss+xml" title="pglayers blog" href="/feed.xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -297,7 +297,7 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
             gap: 1.5rem;
         }
 
@@ -349,6 +349,7 @@
 
         .stat-item {
             padding: 2rem;
+            min-width: 0;
         }
 
         .stat-number {
@@ -366,6 +367,87 @@
             font-size: 0.9rem;
         }
 
+        /* Supported PostgreSQL versions */
+        .support {
+            padding: 3rem 0;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-scroll:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 4px;
+        }
+
+        .support-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-subtle);
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .support-table caption {
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-align: left;
+        }
+
+        .support-table th,
+        .support-table td {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .support-table thead th {
+            background: var(--bg-card);
+            font-weight: 600;
+        }
+
+        .support-table .ga-row {
+            background: var(--accent-glow);
+        }
+
+        .support-note {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .support-note a,
+        .profile-desc a,
+        .profile-details a {
+            color: var(--accent-light);
+        }
+
+        .profile-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1.25rem;
+        }
+
+        .profile-details summary {
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .profile-details p {
+            margin-top: 0.75rem;
+        }
+
+        .profile-card .profile-details code {
+            display: inline;
+            padding: 0;
+            border: 0;
+            background: none;
+        }
+
         /* Profiles section */
         .profiles {
             padding: 6rem 0;
@@ -373,7 +455,7 @@
 
         .profile-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
             gap: 1.5rem;
             margin-top: 2rem;
         }
@@ -513,7 +595,8 @@
 
         @media (max-width: 480px) {
             .nav-links a:not(.btn-gh) { display: none; }
-            .stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+            .stat-item { padding: 1rem 0.25rem; }
         }
     </style>
 </head>
@@ -536,10 +619,10 @@
         <!-- Hero -->
         <section class="hero">
             <div class="container">
-                <div class="hero-badge">80+ extensions and counting</div>
+                <div class="hero-badge">84 extensions in the catalog &middot; PostgreSQL 19 GA supported</div>
                 <h1>PostgreSQL extensions<br>as <span class="gradient">stackable layers</span></h1>
                 <p>The official PostgreSQL Docker images include only a handful of ready-to-use extensions. <strong>pglayers</strong> gives you pre-built extensions that stack on top of the official images. No compilers, no dependencies, no waiting.</p>
-                <p>Includes <strong>DocumentDB</strong> for MongoDB wire protocol compatibility, <strong>pgvector</strong> + <strong>pgvectorscale</strong> for AI embeddings, <strong>pg_lake</strong> for Iceberg/data lake access, and much more.</p>
+                <p>Includes <strong>pgvector</strong> for AI embeddings, <strong>PostGIS</strong> for geospatial queries, <strong>pg_lake</strong> for Iceberg/data lake access, and much more. Extension availability varies by PostgreSQL version.</p>
                 <div class="hero-actions">
                     <a href="https://github.com/pglayers/pglayers" class="btn btn-primary">Get Started</a>
                     <a href="#profiles" class="btn btn-secondary">View Profiles</a>
@@ -551,19 +634,21 @@
                         <div class="code-dot green"></div>
                         <span>terminal</span>
                     </div>
-                    <pre><span class="comment"># Ready-to-use: all 80+ extensions included</span>
+                    <pre><span class="comment"># PostgreSQL 19 GA: 62 extensions, pre-configured</span>
 <span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
-  ghcr.io/pglayers/pglayers-full:17
+  ghcr.io/pglayers/pglayers-full:19
 
-<span class="comment"># Match the open-source extensions available in Azure Database for PostgreSQL</span>
+<span class="comment"># Azure profile on PG19: 24 extensions</span>
 <span class="cmd">docker run</span> <span class="string">-d -e POSTGRES_PASSWORD=secret</span> \
-  ghcr.io/pglayers/pglayers-azure:17
+  ghcr.io/pglayers/pglayers-azure:19
 
-<span class="comment"># Or pick your own extensions</span>
-<span class="keyword">FROM</span> postgres:17
-<span class="keyword">COPY --from=</span><span class="string">ghcr.io/pglayers/pgx-pgvector:17</span>  / /
-<span class="keyword">COPY --from=</span><span class="string">ghcr.io/pglayers/pgx-pg_cron:17</span>   / /
-<span class="keyword">COPY --from=</span><span class="string">ghcr.io/pglayers/pgx-postgis:17</span>   / /</pre>
+<span class="comment"># Or compose your own PG19 image (Dockerfile)</span>
+<span class="keyword">FROM</span> postgres:19
+<span class="keyword">COPY --from=</span><span class="string">ghcr.io/pglayers/pgx-pgvector:19</span> / /extensions/pgvector/
+<span class="keyword">RUN</span> echo <span class="string">"extension_control_path = '/extensions/pgvector/share:\$system'"</span> \
+      &gt;&gt; /usr/share/postgresql/postgresql.conf.sample \
+ &amp;&amp; echo <span class="string">"dynamic_library_path = '/extensions/pgvector/lib:\$libdir'"</span> \
+      &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</pre>
                 </div>
             </div>
         </section>
@@ -572,21 +657,65 @@
         <section class="container">
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-number">53</div>
-                    <div class="stat-label">Extensions</div>
+                    <div class="stat-number">84</div>
+                    <div class="stat-label">Extensions in the catalog</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">3</div>
-                    <div class="stat-label">PG Versions</div>
+                    <div class="stat-label">Stable PG versions: 17, 18, 19</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">2</div>
-                    <div class="stat-label">Architectures</div>
+                    <div class="stat-label">Architectures: amd64 + arm64</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">0</div>
                     <div class="stat-label">Compilation needed</div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Version support: catalog availability is not a profile image count. -->
+        <section class="support" id="versions" aria-labelledby="versions-title">
+            <div class="container">
+                <div class="section-label">PostgreSQL 17, 18, and 19</div>
+                <h2 class="section-title" id="versions-title">PostgreSQL 19 is ready</h2>
+                <p class="section-desc">Built on the official GA images, including <code>postgres:19</code>. Choose your PostgreSQL major and the extension set you need. Every published image supports amd64 and arm64.</p>
+                <div class="table-scroll" role="region" aria-label="PostgreSQL extension support" tabindex="0">
+                    <table class="support-table">
+                        <caption>Extension availability and published profile counts, verified <time datetime="2026-11-20">November 20, 2026</time>.</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">PostgreSQL (GA)</th>
+                                <th scope="col">Individual layers</th>
+                                <th scope="col">Full profile</th>
+                                <th scope="col">Azure profile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-pg="17">
+                                <th scope="row">17</th>
+                                <td>84</td>
+                                <td>83</td>
+                                <td>31</td>
+                            </tr>
+                            <tr data-pg="18">
+                                <th scope="row">18</th>
+                                <td>84</td>
+                                <td>83</td>
+                                <td>31</td>
+                            </tr>
+                            <tr class="ga-row" data-pg="19">
+                                <th scope="row">19</th>
+                                <td>62</td>
+                                <td>62</td>
+                                <td>24</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="support-note">The catalog has 84 extensions, not 84 in every image. PG19 currently has 62 compatible layers; others are waiting on upstream support or packages. On PG17/18, the full profile includes 83 extensions: <code>pg_lake</code> is excluded because it conflicts with <code>pg_duckdb</code>, but remains available as an individual layer.</p>
+                <p class="support-note">CI builds both architectures, tests layer loading and functionality on each supported major, and validates Azure profiles, the PG19 full profile, and Kubernetes/CloudNativePG on PG18/19. See the <a href="https://github.com/pglayers/pglayers#available-extensions">extension catalog</a> and <a href="https://github.com/pglayers/pglayers/blob/main/docs/pg19-evaluation.md">PG19 compatibility notes</a>.</p>
             </div>
         </section>
 
@@ -600,7 +729,7 @@
                     <div class="feature-card">
                         <div class="feature-icon">&#x1F4E6;</div>
                         <h3>Composable Layers</h3>
-                        <p>Each extension is a self-contained Docker layer. Add one line per extension to your Dockerfile. They compose cleanly with no conflicts.</p>
+                        <p>Each extension is a self-contained Docker layer. Copy the layers you need and configure PostgreSQL to discover them. Choose compatible extensions for your workload.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">&#x1F3E2;</div>
@@ -615,7 +744,7 @@
                     <div class="feature-card">
                         <div class="feature-icon">&#x1F50D;</div>
                         <h3>Tested & Verified</h3>
-                        <p>Every extension is tested for file collisions, missing shared libraries, and runtime functionality across all PG versions.</p>
+                        <p>Each supported extension/version pair is tested for dependency resolution, isolation, loading, and functionality. Profile images also get startup-log and server-crash checks.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">&#x1F30D;</div>
@@ -624,8 +753,8 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">&#x1F512;</div>
-                        <h3>Permissive Licenses</h3>
-                        <p>Only extensions with permissive open-source licenses. No proprietary dependencies, no surprise restrictions.</p>
+                        <h3>License-Checked</h3>
+                        <p>Automated license checks enforce the project's open-source policy, with documented exceptions for PostGIS and pgRouting. No proprietary client dependencies.</p>
                     </div>
                 </div>
             </div>
@@ -636,20 +765,24 @@
             <div class="container">
                 <div class="section-label">Ready-to-use images</div>
                 <h2 class="section-title">Profile images</h2>
-                <p class="section-desc">Pre-configured PostgreSQL images with curated extension sets. Run one command and get a fully-loaded database.</p>
+                <p class="section-desc">Pre-configured images for PostgreSQL 17, 18, and 19, with extension paths and preload libraries already set. Pick a major version using the image tag.</p>
                 <div class="profile-cards">
                     <div class="profile-card">
-                        <div class="profile-badge">30+ extensions</div>
+                        <div class="profile-badge">31 on PG17/18 &middot; 24 on PG19</div>
                         <h3>Azure</h3>
-                        <p class="profile-desc">Extensions matching Azure Database for PostgreSQL Flexible Server. Includes DocumentDB for MongoDB wire protocol compatibility (same engine as Azure DocumentDB).</p>
-                        <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-azure:17</code>
-                        <p class="profile-desc" style="margin-top: 1rem; margin-bottom: 0;"><a href="/blog/2026-08-26-mongodb-on-postgresql-documentdb.html" style="color: var(--accent-light); text-decoration: none;">Read the guide: connect a MongoDB client to DocumentDB &rarr;</a></p>
+                        <p class="profile-desc">A curated subset of extensions available in Azure Database for PostgreSQL Flexible Server, for local development. Versions and managed-service behavior can differ. DocumentDB's MongoDB wire protocol is included on PG17/18 only, not PG19.</p>
+                        <code>docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:19</code>
+                        <details class="profile-details">
+                            <summary>Why does PG19 include fewer extensions?</summary>
+                            <p>These seven Azure-profile members are not yet available in pglayers for PG19: <code>age</code>, <code>documentdb</code>, <code>pg_duckdb</code>, <code>pg_failover_slots</code>, <code>rum</code>, <code>tds_fdw</code>, and <code>timescaledb</code>. Their upstream code, packages, or images still need compatible releases and validation.</p>
+                        </details>
+                        <p class="profile-desc" style="margin-top: 1rem; margin-bottom: 0;"><a href="/blog/2026-08-26-mongodb-on-postgresql-documentdb.html">DocumentDB guide for PG17/18: connect a MongoDB client &rarr;</a></p>
                     </div>
                     <div class="profile-card">
-                        <div class="profile-badge">80+ extensions</div>
+                        <div class="profile-badge">83 on PG17/18 &middot; 62 on PG19</div>
                         <h3>Full</h3>
-                        <p class="profile-desc">Every extension pglayers provides. The complete toolkit for development, testing, and experimentation.</p>
-                        <code>docker run -d -e POSTGRES_PASSWORD=s ghcr.io/pglayers/pglayers-full:17</code>
+                        <p class="profile-desc">The broadest compatible extension set for each PostgreSQL major. PG19 includes pgvector, PostGIS, pg_cron, pg_textsearch, pg_lake, and more. PG17/18 keep pg_duckdb instead of the conflicting pg_lake layer.</p>
+                        <code>docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-full:19</code>
                     </div>
                 </div>
             </div>
@@ -660,8 +793,8 @@
             <div class="container">
                 <div class="section-label">Kubernetes Native</div>
                 <h2 class="section-title">Runtime extensions via ImageVolumes</h2>
-                <p class="section-desc">PostgreSQL 18 introduced <code style="background:var(--bg-card);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.9em;">extension_control_path</code> -- and pglayers takes full advantage. Mount extensions at deploy time with zero image rebuilds.</p>
-                <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <p class="section-desc">PostgreSQL 18 introduced <code style="background:var(--bg-card);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.9em;">extension_control_path</code>. PG18 and PG19 use isolated extension directories, so you can mount layers at deploy time with no custom image build.</p>
+                <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));">
                     <div class="feature-card">
                         <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x2638;</div>
                         <h3>Kubernetes ImageVolumes</h3>
@@ -679,8 +812,8 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon" style="background: rgba(16, 185, 129, 0.15);">&#x1F6E1;</div>
-                        <h3>Zero Collision Risk</h3>
-                        <p>Each extension lives in its own namespace. Two extensions can bundle different versions of the same library without conflict -- collisions are structurally impossible.</p>
+                        <h3>Isolated Files &amp; Libraries</h3>
+                        <p>Each extension has its own directory and private bundled libraries, avoiding file overwrites and dependency leaks. Runtime incompatibilities still matter; see the compatibility notes.</p>
                     </div>
                 </div>
                 <div class="hero-code" style="margin-top: 3rem;">
@@ -690,28 +823,39 @@
                         <div class="code-dot green"></div>
                         <span>pod.yaml</span>
                     </div>
-                    <pre><span class="comment"># Stock postgres:18 + extensions as Kubernetes ImageVolumes</span>
-<span class="comment"># No custom image build required</span>
+                    <pre><span class="comment"># Stock postgres:19 + extensions as Kubernetes ImageVolumes</span>
+<span class="comment"># Requires the ImageVolume feature enabled on your cluster</span>
 <span class="keyword">apiVersion:</span> v1
 <span class="keyword">kind:</span> Pod
+<span class="keyword">metadata:</span>
+  <span class="keyword">name:</span> pg-extensions
 <span class="keyword">spec:</span>
   <span class="keyword">volumes:</span>
     - <span class="keyword">name:</span> ext-pgvector
       <span class="keyword">image:</span>
-        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-pgvector:18-0.8.5</span>
+        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-pgvector:19-0.8.7</span>
     - <span class="keyword">name:</span> ext-postgis
       <span class="keyword">image:</span>
-        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-postgis:18-3.6.4</span>
+        <span class="keyword">reference:</span> <span class="string">ghcr.io/pglayers/pgx-postgis:19-3.7.0</span>
   <span class="keyword">containers:</span>
-    - <span class="keyword">image:</span> <span class="string">postgres:18</span>
-      <span class="keyword">args:</span> [<span class="string">"postgres"</span>, <span class="string">"-c"</span>, <span class="string">"extension_control_path=...$$system"</span>]
+    - <span class="keyword">name:</span> postgres
+      <span class="keyword">image:</span> <span class="string">postgres:19</span>
+      <span class="keyword">env:</span>
+        - <span class="keyword">name:</span> POSTGRES_PASSWORD
+          <span class="keyword">value:</span> <span class="string">"local-demo-only"</span>
+      <span class="keyword">args:</span>
+        - <span class="string">"postgres"</span>
+        - <span class="string">"-c"</span>
+        - <span class="string">"extension_control_path=/extensions/pgvector/share:/extensions/postgis/share:$system"</span>
+        - <span class="string">"-c"</span>
+        - <span class="string">"dynamic_library_path=/extensions/pgvector/lib:/extensions/postgis/lib:$libdir"</span>
       <span class="keyword">volumeMounts:</span>
         - <span class="keyword">name:</span> ext-pgvector
           <span class="keyword">mountPath:</span> <span class="string">/extensions/pgvector</span>
         - <span class="keyword">name:</span> ext-postgis
           <span class="keyword">mountPath:</span> <span class="string">/extensions/postgis</span></pre>
                 </div>
-                <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem; text-align: center;">Requires PostgreSQL 18+ and Kubernetes 1.33+. Works with any orchestrator -- CNPG, plain Deployments, StatefulSets, or Helm charts.</p>
+                <p class="support-note" style="text-align: center;">Tested on PG18 and PG19 with Kubernetes 1.33+ and CloudNativePG. ImageVolumes must be enabled on your cluster. The password above is for a local demo; use a Secret in production. After startup, run <code>CREATE EXTENSION vector;</code> and <code>CREATE EXTENSION postgis;</code>. See the <a href="https://github.com/pglayers/pglayers#kubernetes-imagevolumes-without-cnpg">Kubernetes setup guide</a>.</p>
             </div>
         </section>
 
