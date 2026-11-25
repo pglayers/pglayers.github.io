@@ -1,7 +1,9 @@
 """Static-site regression checks; Python standard library only."""
 
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from pathlib import Path
+import re
 import unittest
 from urllib.parse import urljoin, urlsplit, unquote
 import xml.etree.ElementTree as ET
@@ -134,10 +136,68 @@ class SiteTests(unittest.TestCase):
 
     def test_feed_and_historical_post_targets(self):
         feed = ET.parse(ROOT / "feed.xml")
+        dates = [parsedate_to_datetime(i.findtext("pubDate")) for i in feed.findall("./channel/item")]
+        self.assertEqual(dates, sorted(dates, reverse=True))
+        self.assertGreaterEqual(parsedate_to_datetime(feed.findtext("./channel/lastBuildDate")), dates[0])
         for item in feed.findall("./channel/item"):
             path = ROOT / urlsplit(item.findtext("link")).path.lstrip("/")
             self.assertIn(path, self.pages)
-            self.assertTrue(item.findtext("{http://purl.org/rss/1.0/modules/content/}encoded"))
+            content = item.findtext("{http://purl.org/rss/1.0/modules/content/}encoded")
+            self.assertTrue(content)
+            Page(content)
+            self.assertTrue(item.findtext("{http://purl.org/dc/elements/1.1/}creator").startswith("Ismaël Mejía"))
+            self.assertTrue({"PostgreSQL", "Docker", "Containers"}.issubset(
+                {category.text for category in item.findall("category")}))
+
+    def test_pg19_post_and_feed_have_identical_full_html(self):
+        filename = "2026-11-25-postgresql-19-support.html"
+        source = (ROOT / "blog" / filename).read_text()
+        marker = '<div class="article-body" id="post-content">'
+        self.assertIn(marker, source)
+        content = source.split(marker, 1)[1].split("\n        </div>\n    </article>", 1)[0].strip()
+        feed = ET.parse(ROOT / "feed.xml")
+        item = next(i for i in feed.findall("./channel/item")
+                    if i.findtext("link").endswith(filename))
+        self.assertEqual(item.findtext("{http://purl.org/rss/1.0/modules/content/}encoded").strip(), content)
+        self.assertEqual(item.findtext("title"), "PostgreSQL 19 is now supported in pglayers")
+        self.assertEqual(parsedate_to_datetime(item.findtext("pubDate")).date().isoformat(), "2026-11-25")
+        post = self.pages[ROOT / "blog" / filename].root
+        self.assertEqual(next(post.elements("time")).attrs["datetime"], "2026-11-25")
+
+    def test_pg19_post_preserves_approved_draft(self):
+        draft_path = ROOT / "drafts" / "2026-11-25-postgresql-19-support.md"
+        if not draft_path.exists():
+            self.skipTest("The local Markdown draft is not part of the published site")
+        draft = draft_path.read_text()
+        post = self.pages[ROOT / "blog" / "2026-11-25-postgresql-19-support.html"].root
+        headings = re.findall(r"^## (.+)$", draft, re.MULTILINE)
+        self.assertEqual([h.text() for h in post.elements("h2")], headings)
+        blocks = re.findall(r"^```\w*\n(.*?)\n```", draft, re.MULTILINE | re.DOTALL)
+        self.assertEqual([pre.text() for pre in post.elements("pre")], blocks)
+        content = next(e for e in post.elements("div") if e.attrs.get("id") == "post-content")
+
+        def plain(text):
+            text = re.sub(r"\[([^]]+)\]\([^)]+\)", r"\1", text)
+            return " ".join(text.replace("**", "").replace("`", "").split())
+
+        paragraphs = []
+        current = []
+        in_code = False
+        for line in draft.splitlines() + [""]:
+            if line.startswith("```"):
+                in_code = not in_code
+                continue
+            if in_code:
+                continue
+            if not line.strip():
+                if current:
+                    paragraphs.append(plain(" ".join(current)))
+                    current = []
+            elif not line.startswith(("#", "- ", "|", "*By ")):
+                current.append(line)
+        self.assertEqual([" ".join(p.text().split()) for p in content.elements("p")], paragraphs)
+        self.assertEqual([" ".join(li.text().split()) for li in content.elements("li")],
+                         [plain(line[2:]) for line in draft.splitlines() if line.startswith("- ")])
 
 
 if __name__ == "__main__":
