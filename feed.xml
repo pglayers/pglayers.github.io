@@ -6,7 +6,7 @@
     <description>Updates, guides, and announcements from the pglayers project -- by Ismaël Mejía &lt;iemejia@gmail.com&gt;.</description>
     <language>en-us</language>
     <managingEditor>Ismaël Mejía &lt;iemejia@gmail.com&gt;</managingEditor>
-    <lastBuildDate>Wed, 25 Nov 2026 12:42:05 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 25 Nov 2026 13:27:24 +0000</lastBuildDate>
     <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
@@ -81,9 +81,9 @@ SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
             </tr>
         </thead>
         <tbody>
-            <tr><th scope="row">17</th><td>84</td><td>83</td><td>31</td></tr>
-            <tr><th scope="row">18</th><td>84</td><td>83</td><td>31</td></tr>
             <tr><th scope="row">19</th><td>62</td><td>62</td><td>24</td></tr>
+            <tr><th scope="row">18</th><td>84</td><td>83</td><td>31</td></tr>
+            <tr><th scope="row">17</th><td>84</td><td>83</td><td>31</td></tr>
         </tbody>
     </table>
 </div>

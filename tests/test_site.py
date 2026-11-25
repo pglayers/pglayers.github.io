@@ -107,9 +107,10 @@ class SiteTests(unittest.TestCase):
         # on 2026-11-20. Update deliberately when refreshing the homepage counts.
         rows = {r.attrs["data-pg"]: [c.text().strip() for c in r.elements("td")]
                 for r in self.home.elements("tr") if "data-pg" in r.attrs}
-        self.assertEqual(rows, {"17": ["84", "83", "31"],
+        self.assertEqual(list(rows), ["19", "18", "17"])
+        self.assertEqual(rows, {"19": ["62", "62", "24"],
                                 "18": ["84", "83", "31"],
-                                "19": ["62", "62", "24"]})
+                                "17": ["84", "83", "31"]})
         text = self.home.text()
         self.assertIn("84 extensions in the catalog", text)
         self.assertIn("PostgreSQL 19 GA supported", text)
@@ -117,6 +118,10 @@ class SiteTests(unittest.TestCase):
         self.assertIn("83 on PG17/18 · 62 on PG19", text)
         self.assertIn("PG17/18 only, not PG19", text)
         self.assertNotIn("all 80+", text)
+
+    def test_homepage_has_no_displayed_dates(self):
+        self.assertFalse(list(self.home.elements("time")))
+        self.assertNotRegex(self.home.text(), r"\b20\d{2}\b")
 
     def test_pg19_examples_keep_isolated_paths_and_literal_gucs(self):
         examples = [pre.text() for pre in self.home.elements("pre")]
@@ -163,6 +168,9 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(parsedate_to_datetime(item.findtext("pubDate")).date().isoformat(), "2026-11-25")
         post = self.pages[ROOT / "blog" / filename].root
         self.assertEqual(next(post.elements("time")).attrs["datetime"], "2026-11-25")
+        table = next(post.elements("table"))
+        self.assertEqual([th.text() for th in table.elements("th") if th.attrs.get("scope") == "row"],
+                         ["19", "18", "17"])
 
     def test_pg19_post_preserves_approved_draft(self):
         draft_path = ROOT / "drafts" / "2026-11-25-postgresql-19-support.md"

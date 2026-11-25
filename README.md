@@ -40,8 +40,9 @@ repository, then verify the published image labels
 amd64 and arm64. A profile can exclude a runtime-conflicting extension even
 when its individual layer exists.
 
-Update the hero, stats, support table and verification date, profile badges,
-and the count snapshot in `tests/test_site.py` together. Keep each example's
+Update the hero, stats, support table, profile badges, and the count snapshot
+in `tests/test_site.py` together. Keep displayed dates on the dated blog posts
+and RSS feed, not the homepage. Keep each example's
 PostgreSQL major consistent with its layer tags and filesystem layout.
 Historical posts retain their original release context; if editing a post,
 also synchronize its full HTML in `feed.xml`.
