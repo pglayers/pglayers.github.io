@@ -202,6 +202,7 @@
             border: 1px solid var(--border);
             padding: 0.15em 0.4em;
             border-radius: 4px;
+            overflow-wrap: anywhere;
         }
 
         .article-container pre {
@@ -219,6 +220,7 @@
             padding: 0;
             font-size: 0.85rem;
             line-height: 1.7;
+            overflow-wrap: normal;
         }
 
         .article-container blockquote {
@@ -313,10 +315,10 @@
             listens on):
         </p>
 
-        <pre><code>docker run -d --name pglayers-docdb \
-  -e POSTGRES_PASSWORD=secret \
-  -p 5432:5432 -p 10260:10260 \
-  ghcr.io/pglayers/pglayers-azure:18</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-docdb \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">10260:10260</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:18</span></code></pre>
 
         <p>
             The profile image auto-configures everything at boot: it sets
@@ -351,8 +353,8 @@
             fails:
         </p>
 
-        <pre><code>ERROR:  password type is not a plain text
-CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</code></pre>
+        <pre><code><span class="token-error" style="color: #f87171">ERROR:</span>  password type is not a plain text
+<span class="token-error" style="color: #f87171">CONTEXT:</span>  ... <span class="token-keyword" style="color: #818cf8">CREATE ROLE</span> mongoadmin <span class="token-keyword" style="color: #818cf8">WITH LOGIN PASSWORD</span> <span class="token-string" style="color: #10b981">'SCRAM-SHA-256$...'</span></code></pre>
 
         <p>
             The reason: the server runs with
@@ -369,9 +371,9 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
             verifier the gateway expects:
         </p>
 
-        <pre><code>docker exec pglayers-docdb psql -U postgres -c \
-  "CREATE ROLE mongoadmin WITH LOGIN INHERIT PASSWORD 'Secret_123' \
-   IN ROLE documentdb_admin_role, documentdb_readonly_role;"</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> exec pglayers-docdb <span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-U</span> postgres <span class="token-option" style="color: #818cf8">-c</span> \
+  <span class="token-string" style="color: #10b981">"CREATE ROLE mongoadmin WITH LOGIN INHERIT PASSWORD 'Secret_123' \
+   IN ROLE documentdb_admin_role, documentdb_readonly_role;"</span></code></pre>
 
         <blockquote>
             <p>
@@ -391,19 +393,19 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
             connection string is:
         </p>
 
-        <pre><code>mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256</code></pre>
+        <pre><code><span class="token-string" style="color: #10b981">mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256</span></code></pre>
 
         <p>
             Here's a full round-trip with <code>mongosh</code> (run from a throwaway
             container on the host network) -- insert, filtered find, and an aggregation:
         </p>
 
-        <pre><code>docker run --rm --network host mongodb/mongodb-community-server:latest mongosh --quiet \
-  "mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256" \
-  --eval 'const db = db.getSiblingDB("shop");
-          db.products.insertMany([{name:"Widget",price:9.99},{name:"Gadget",price:19.5}]);
-          printjson(db.products.find({price:{$gte:10}}).toArray());
-          printjson(db.products.aggregate([{$group:{_id:null,avg:{$avg:"$price"}}}]).toArray());'</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">--rm --network</span> host <span class="token-string" style="color: #10b981">mongodb/mongodb-community-server:latest</span> <span class="token-command" style="color: #f59e0b">mongosh</span> <span class="token-option" style="color: #818cf8">--quiet</span> \
+  <span class="token-string" style="color: #10b981">"mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"</span> \
+  <span class="token-option" style="color: #818cf8">--eval</span> '<span class="token-keyword" style="color: #818cf8">const</span> db = db.getSiblingDB(<span class="token-string" style="color: #10b981">"shop"</span>);
+          db.products.insertMany([{name:<span class="token-string" style="color: #10b981">"Widget"</span>,price:<span class="token-number" style="color: #3b82f6">9.99</span>},{name:<span class="token-string" style="color: #10b981">"Gadget"</span>,price:<span class="token-number" style="color: #3b82f6">19.5</span>}]);
+          <span class="token-command" style="color: #f59e0b">printjson</span>(db.products.find({price:{$gte:<span class="token-number" style="color: #3b82f6">10</span>}}).toArray());
+          <span class="token-command" style="color: #f59e0b">printjson</span>(db.products.aggregate([{$group:{_id:<span class="token-keyword" style="color: #818cf8">null</span>,avg:{$avg:<span class="token-string" style="color: #10b981">"$price"</span>}}}]).toArray());'</code></pre>
 
         <p>
             This inserts two documents, returns <code>Gadget</code> for the
@@ -412,15 +414,15 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
             <code>pymongo</code> or the Node.js driver:
         </p>
 
-        <pre><code>from pymongo import MongoClient
+        <pre><code><span class="token-keyword" style="color: #818cf8">from</span> pymongo <span class="token-keyword" style="color: #818cf8">import</span> MongoClient
 
-client = MongoClient(
-    "mongodb://mongoadmin:Secret_123@localhost:10260/"
-    "?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"
+client = <span class="token-command" style="color: #f59e0b">MongoClient</span>(
+    <span class="token-string" style="color: #10b981">"mongodb://mongoadmin:Secret_123@localhost:10260/"</span>
+    <span class="token-string" style="color: #10b981">"?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"</span>
 )
-db = client["shop"]
-db.products.insert_one({"name": "Sprocket", "price": 4.5})
-print(db.products.find_one({"name": "Sprocket"}))</code></pre>
+db = client[<span class="token-string" style="color: #10b981">"shop"</span>]
+db.products.insert_one({<span class="token-string" style="color: #10b981">"name"</span>: <span class="token-string" style="color: #10b981">"Sprocket"</span>, <span class="token-string" style="color: #10b981">"price"</span>: <span class="token-number" style="color: #3b82f6">4.5</span>})
+<span class="token-command" style="color: #f59e0b">print</span>(db.products.find_one({<span class="token-string" style="color: #10b981">"name"</span>: <span class="token-string" style="color: #10b981">"Sprocket"</span>}))</code></pre>
 
         <p>
             Because it's all PostgreSQL underneath, the same data is queryable from SQL --
@@ -452,9 +454,9 @@ print(db.products.find_one({"name": "Sprocket"}))</code></pre>
             client:
         </p>
 
-        <pre><code>docker run -d -p 5432:5432 -p 10260:10260 \
-  -e POSTGRES_PASSWORD=secret \
-  ghcr.io/pglayers/pglayers-azure:18</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">10260:10260</span> \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:18</span></code></pre>
 
         <p>
             See the <a href="https://github.com/pglayers/pglayers">pglayers repository</a>

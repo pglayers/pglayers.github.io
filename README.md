@@ -54,6 +54,12 @@ also synchronize its full HTML in `feed.xml`.
 3. Add an item to `feed.xml` (include full HTML content in
    `<content:encoded>` and the required category tags)
 
+Every code block must be syntax-colored. Use static token spans with inline
+colors from the palette in `AGENTS.md`, so the same markup works on the site
+and in RSS readers without scripts or external stylesheets. Preserve the
+exact code text and copy the highlighted HTML into the full feed content.
+The static tests check coloring and article/feed parity for every post.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md)

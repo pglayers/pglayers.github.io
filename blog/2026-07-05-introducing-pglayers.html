@@ -340,20 +340,20 @@
             files are laid out at exactly the paths PostgreSQL expects:
         </p>
 
-        <pre><code>/usr/lib/postgresql/17/lib/vector.so
-/usr/share/postgresql/17/extension/vector.control
-/usr/share/postgresql/17/extension/vector--0.8.3.sql</code></pre>
+        <pre><code><span class="token-path" style="color: #10b981">/usr/lib/postgresql/17/lib/vector.so</span>
+<span class="token-path" style="color: #10b981">/usr/share/postgresql/17/extension/vector.control</span>
+<span class="token-path" style="color: #10b981">/usr/share/postgresql/17/extension/vector--0.8.3.sql</span></code></pre>
 
         <p>
             To use them, you write a standard multi-stage <code>COPY --from</code> in your
             Dockerfile:
         </p>
 
-        <pre><code>FROM postgres:17
+        <pre><code><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:17</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:17  / /
-COPY --from=ghcr.io/pglayers/pgx-pg_cron:17   / /
-COPY --from=ghcr.io/pglayers/pgx-postgis:17   / /</code></pre>
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:17</span>  / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pg_cron:17</span>   / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-postgis:17</span>   / /</code></pre>
 
         <p>
             That's it. Docker pulls the pre-built layers from the registry and overlays
@@ -364,9 +364,9 @@ COPY --from=ghcr.io/pglayers/pgx-postgis:17   / /</code></pre>
 
         <p>Then you can <code>CREATE EXTENSION</code> as usual:</p>
 
-        <pre><code>CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS pg_cron;
-CREATE EXTENSION IF NOT EXISTS postgis;</code></pre>
+        <pre><code><span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> vector;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> pg_cron;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> postgis;</code></pre>
 
         <h2>Ready-to-use profile images</h2>
 
@@ -375,11 +375,11 @@ CREATE EXTENSION IF NOT EXISTS postgis;</code></pre>
             combined images called <strong>profiles</strong>:
         </p>
 
-        <pre><code># All 50+ extensions, pre-configured
-docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-full:17
+        <pre><code><span class="token-comment" style="color: #8888a0"># All 50+ extensions, pre-configured</span>
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:17</span>
 
-# Extensions matching Azure Database for PostgreSQL
-docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:17</code></pre>
+<span class="token-comment" style="color: #8888a0"># Extensions matching Azure Database for PostgreSQL</span>
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:17</span></code></pre>
 
         <p>
             Profile images come with <code>shared_preload_libraries</code> already
@@ -451,38 +451,38 @@ docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:17</co
             The fastest way to try pglayers is the full profile image:
         </p>
 
-        <pre><code>docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret \
-  ghcr.io/pglayers/pglayers-full:17</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:17</span></code></pre>
 
         <p>
             Then connect and enable any extension:
         </p>
 
-        <pre><code>psql -h localhost -U postgres
-CREATE EXTENSION vector;
-CREATE EXTENSION postgis;
-SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-h</span> localhost <span class="token-option" style="color: #818cf8">-U</span> postgres
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION</span> vector;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION</span> postgis;
+<span class="token-keyword" style="color: #818cf8">SELECT</span> <span class="token-string" style="color: #10b981">'[1,2,3]'</span>::vector <span class="token-operator" style="color: #818cf8">&lt;-&gt;</span> <span class="token-string" style="color: #10b981">'[4,5,6]'</span>::vector <span class="token-keyword" style="color: #818cf8">AS</span> distance;</code></pre>
 
         <p>
             To build a custom image with only the extensions you need, create a
             Dockerfile:
         </p>
 
-        <pre><code>FROM postgres:17
+        <pre><code><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:17</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:17       / /
-COPY --from=ghcr.io/pglayers/pgx-timescaledb:17    / /
-COPY --from=ghcr.io/pglayers/pgx-pg_cron:17        / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:17</span>       / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-timescaledb:17</span>    / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pg_cron:17</span>        / /
 
-RUN echo "shared_preload_libraries = 'timescaledb,pg_cron'" \
-    >> /usr/share/postgresql/postgresql.conf.sample</code></pre>
+<span class="token-keyword" style="color: #818cf8">RUN</span> <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"shared_preload_libraries = 'timescaledb,pg_cron'"</span> \
+    &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</code></pre>
 
         <p>
             Build and run:
         </p>
 
-        <pre><code>docker build -t my-postgres .
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret my-postgres</code></pre>
+        <pre><code><span class="token-command" style="color: #f59e0b">docker</span> build <span class="token-option" style="color: #818cf8">-t</span> my-postgres .
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> my-postgres</code></pre>
 
         <h2>Open source</h2>
 

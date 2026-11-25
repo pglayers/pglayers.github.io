@@ -154,6 +154,54 @@ class SiteTests(unittest.TestCase):
             self.assertTrue({"PostgreSQL", "Docker", "Containers"}.issubset(
                 {category.text for category in item.findall("category")}))
 
+    def test_all_code_blocks_are_colored(self):
+        palette = {"#f59e0b", "#818cf8", "#10b981", "#3b82f6", "#8888a0", "#f87171"}
+        for path, page in self.pages.items():
+            for index, pre in enumerate(page.root.elements("pre"), 1):
+                with self.subTest(page=path.name, block=index):
+                    spans = list(pre.elements("span"))
+                    self.assertTrue(spans, "Code block has no syntax coloring")
+                    if path.parent.name == "blog":
+                        for span in spans:
+                            self.assertTrue(span.attrs.get("class", "").startswith("token-"))
+                            color = re.fullmatch(r"color:\s*(#[0-9a-f]{6})", span.attrs.get("style", ""))
+                            self.assertIsNotNone(color, "Blog tokens need inline colors for RSS")
+                            self.assertIn(color.group(1), palette)
+                    else:
+                        self.assertTrue(any(span.attrs.get("class") in {"comment", "keyword", "string", "cmd"}
+                                            for span in spans))
+
+    def test_full_blog_content_and_highlighting_match_feed(self):
+        def signature(element):
+            if element.tag == "pre":
+                return (element.tag, element.text(),
+                        [(sorted(span.attrs.items()), span.text()) for span in element.elements("span")])
+            children = []
+            for child in element.children:
+                if isinstance(child, Element):
+                    children.append(signature(child))
+                elif child.strip():
+                    children.append(" ".join(child.split()))
+            return (element.tag, sorted(element.attrs.items()), children)
+
+        for item in ET.parse(ROOT / "feed.xml").findall("./channel/item"):
+            path = ROOT / urlsplit(item.findtext("link")).path.lstrip("/")
+            article = next(self.pages[path].root.elements("article"))
+            body = next((e for e in article.elements("div") if e.attrs.get("id") == "post-content"), None)
+            if body is None:
+                body = Element("document")
+                after_title = False
+                for child in article.children:
+                    if isinstance(child, Element) and child.tag == "h1":
+                        after_title = True
+                    elif after_title:
+                        body.children.append(child)
+            feed = Page(item.findtext("{http://purl.org/rss/1.0/modules/content/}encoded")).root
+            # Ignore the article-body wrapper, which is page layout, not post content.
+            body_signature = signature(body)[2]
+            with self.subTest(post=path.name):
+                self.assertEqual(body_signature, signature(feed)[2])
+
     def test_pg19_post_and_feed_have_identical_full_html(self):
         filename = "2026-11-25-postgresql-19-support.html"
         source = (ROOT / "blog" / filename).read_text()

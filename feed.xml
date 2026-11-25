@@ -6,7 +6,7 @@
     <description>Updates, guides, and announcements from the pglayers project -- by Ismaël Mejía &lt;iemejia@gmail.com&gt;.</description>
     <language>en-us</language>
     <managingEditor>Ismaël Mejía &lt;iemejia@gmail.com&gt;</managingEditor>
-    <lastBuildDate>Wed, 25 Nov 2026 13:27:24 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 25 Nov 2026 13:39:20 +0000</lastBuildDate>
     <atom:link href="https://pglayers.github.io/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
@@ -36,20 +36,20 @@
 
 <p>The Full profile includes all 62 extensions currently available for PostgreSQL 19:</p>
 
-<pre><code class="language-sh">docker run -d --name pglayers-pg19 \
-  -e POSTGRES_PASSWORD=change-me \
-  -p 127.0.0.1:5432:5432 \
-  ghcr.io/pglayers/pglayers-full:19</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-pg19 \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
+  <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">127.0.0.1:5432:5432</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:19</span></code></pre>
 
 <p>Once PostgreSQL is ready, connect with:</p>
 
-<pre><code class="language-sh">docker exec -it pglayers-pg19 psql -U postgres</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> exec <span class="token-option" style="color: #818cf8">-it</span> pglayers-pg19 <span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-U</span> postgres</code></pre>
 
 <p>For example, enable pgvector and calculate a vector distance:</p>
 
-<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;
+<pre><code class="language-sql"><span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> vector;
 
-SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+<span class="token-keyword" style="color: #818cf8">SELECT</span> <span class="token-string" style="color: #10b981">'[1,2,3]'</span>::vector <span class="token-operator" style="color: #818cf8">&lt;-&gt;</span> <span class="token-string" style="color: #10b981">'[4,5,6]'</span>::vector <span class="token-keyword" style="color: #818cf8">AS</span> distance;</code></pre>
 
 <p>The profile takes care of the server configuration. You still create the SQL extensions you want to use in each database.</p>
 
@@ -98,9 +98,9 @@ SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
 
 <p>If you want a smaller collection based on extensions available in Azure Database for PostgreSQL Flexible Server, use:</p>
 
-<pre><code class="language-sh">docker run -d --name pglayers-azure-pg19 \
-  -e POSTGRES_PASSWORD=change-me \
-  ghcr.io/pglayers/pglayers-azure:19</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-azure-pg19 \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:19</span></code></pre>
 
 <p>The PG19 Azure profile currently includes <strong>24 extensions</strong>, compared with <strong>31 on PG17 and PG18</strong>.</p>
 
@@ -126,22 +126,22 @@ SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
 
 <p>You do not have to use a profile. Here is a complete Dockerfile that adds only pgvector:</p>
 
-<pre><code class="language-dockerfile">FROM postgres:19
+<pre><code class="language-dockerfile"><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:19</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:19 \
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:19</span> \
     / /extensions/pgvector/
 
-RUN echo "extension_control_path = '/extensions/pgvector/share:\$system'" \
+<span class="token-keyword" style="color: #818cf8">RUN</span> <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"extension_control_path = '/extensions/pgvector/share:\$system'"</span> \
         &gt;&gt; /usr/share/postgresql/postgresql.conf.sample \
-    &amp;&amp; echo "dynamic_library_path = '/extensions/pgvector/lib:\$libdir'" \
+    &amp;&amp; <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"dynamic_library_path = '/extensions/pgvector/lib:\$libdir'"</span> \
         &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</code></pre>
 
 <p>Build and run it normally:</p>
 
-<pre><code class="language-sh">docker build -t my-postgres:19 .
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> build <span class="token-option" style="color: #818cf8">-t</span> my-postgres:19 .
 
-docker run -d --name my-postgres \
-  -e POSTGRES_PASSWORD=change-me \
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> my-postgres \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
   my-postgres:19</code></pre>
 
 <p>No extension compilation happens during this build. Docker copies the prebuilt layer.</p>
@@ -220,10 +220,10 @@ docker run -d --name my-postgres \
   on):
 </p>
 
-<pre><code>docker run -d --name pglayers-docdb \
-  -e POSTGRES_PASSWORD=secret \
-  -p 5432:5432 -p 10260:10260 \
-  ghcr.io/pglayers/pglayers-azure:18</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-docdb \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">10260:10260</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:18</span></code></pre>
 
 <p>
   The profile image auto-configures everything at boot: it sets
@@ -255,8 +255,8 @@ docker run -d --name my-postgres \
   <code>documentdb_api.create_user()</code> function, but on a stock image it fails:
 </p>
 
-<pre><code>ERROR:  password type is not a plain text
-CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</code></pre>
+<pre><code><span class="token-error" style="color: #f87171">ERROR:</span>  password type is not a plain text
+<span class="token-error" style="color: #f87171">CONTEXT:</span>  ... <span class="token-keyword" style="color: #818cf8">CREATE ROLE</span> mongoadmin <span class="token-keyword" style="color: #818cf8">WITH LOGIN PASSWORD</span> <span class="token-string" style="color: #10b981">'SCRAM-SHA-256$...'</span></code></pre>
 
 <p>
   The reason: the server runs with <code>password_encryption = scram-sha-256</code>,
@@ -271,9 +271,9 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
   gateway expects:
 </p>
 
-<pre><code>docker exec pglayers-docdb psql -U postgres -c \
-  "CREATE ROLE mongoadmin WITH LOGIN INHERIT PASSWORD 'Secret_123' \
-   IN ROLE documentdb_admin_role, documentdb_readonly_role;"</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> exec pglayers-docdb <span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-U</span> postgres <span class="token-option" style="color: #818cf8">-c</span> \
+  <span class="token-string" style="color: #10b981">"CREATE ROLE mongoadmin WITH LOGIN INHERIT PASSWORD 'Secret_123' \
+   IN ROLE documentdb_admin_role, documentdb_readonly_role;"</span></code></pre>
 
 <blockquote>
   <p>
@@ -292,19 +292,19 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
   is:
 </p>
 
-<pre><code>mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256</code></pre>
+<pre><code><span class="token-string" style="color: #10b981">mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256</span></code></pre>
 
 <p>
   Here's a full round-trip with <code>mongosh</code> (run from a throwaway container
   on the host network) -- insert, filtered find, and an aggregation:
 </p>
 
-<pre><code>docker run --rm --network host mongodb/mongodb-community-server:latest mongosh --quiet \
-  "mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256" \
-  --eval 'const db = db.getSiblingDB("shop");
-          db.products.insertMany([{name:"Widget",price:9.99},{name:"Gadget",price:19.5}]);
-          printjson(db.products.find({price:{$gte:10}}).toArray());
-          printjson(db.products.aggregate([{$group:{_id:null,avg:{$avg:"$price"}}}]).toArray());'</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">--rm --network</span> host <span class="token-string" style="color: #10b981">mongodb/mongodb-community-server:latest</span> <span class="token-command" style="color: #f59e0b">mongosh</span> <span class="token-option" style="color: #818cf8">--quiet</span> \
+  <span class="token-string" style="color: #10b981">"mongodb://mongoadmin:Secret_123@localhost:10260/?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"</span> \
+  <span class="token-option" style="color: #818cf8">--eval</span> '<span class="token-keyword" style="color: #818cf8">const</span> db = db.getSiblingDB(<span class="token-string" style="color: #10b981">"shop"</span>);
+          db.products.insertMany([{name:<span class="token-string" style="color: #10b981">"Widget"</span>,price:<span class="token-number" style="color: #3b82f6">9.99</span>},{name:<span class="token-string" style="color: #10b981">"Gadget"</span>,price:<span class="token-number" style="color: #3b82f6">19.5</span>}]);
+          <span class="token-command" style="color: #f59e0b">printjson</span>(db.products.find({price:{$gte:<span class="token-number" style="color: #3b82f6">10</span>}}).toArray());
+          <span class="token-command" style="color: #f59e0b">printjson</span>(db.products.aggregate([{$group:{_id:<span class="token-keyword" style="color: #818cf8">null</span>,avg:{$avg:<span class="token-string" style="color: #10b981">"$price"</span>}}}]).toArray());'</code></pre>
 
 <p>
   This inserts two documents, returns <code>Gadget</code> for the <code>$gte</code>
@@ -312,15 +312,15 @@ CONTEXT:  ... CREATE ROLE mongoadmin WITH LOGIN PASSWORD 'SCRAM-SHA-256$...'</co
   works from <code>pymongo</code> or the Node.js driver:
 </p>
 
-<pre><code>from pymongo import MongoClient
+<pre><code><span class="token-keyword" style="color: #818cf8">from</span> pymongo <span class="token-keyword" style="color: #818cf8">import</span> MongoClient
 
-client = MongoClient(
-    "mongodb://mongoadmin:Secret_123@localhost:10260/"
-    "?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"
+client = <span class="token-command" style="color: #f59e0b">MongoClient</span>(
+    <span class="token-string" style="color: #10b981">"mongodb://mongoadmin:Secret_123@localhost:10260/"</span>
+    <span class="token-string" style="color: #10b981">"?tls=true&amp;tlsAllowInvalidCertificates=true&amp;authMechanism=SCRAM-SHA-256"</span>
 )
-db = client["shop"]
-db.products.insert_one({"name": "Sprocket", "price": 4.5})
-print(db.products.find_one({"name": "Sprocket"}))</code></pre>
+db = client[<span class="token-string" style="color: #10b981">"shop"</span>]
+db.products.insert_one({<span class="token-string" style="color: #10b981">"name"</span>: <span class="token-string" style="color: #10b981">"Sprocket"</span>, <span class="token-string" style="color: #10b981">"price"</span>: <span class="token-number" style="color: #3b82f6">4.5</span>})
+<span class="token-command" style="color: #f59e0b">print</span>(db.products.find_one({<span class="token-string" style="color: #10b981">"name"</span>: <span class="token-string" style="color: #10b981">"Sprocket"</span>}))</code></pre>
 
 <p>
   Because it's all PostgreSQL underneath, the same data is queryable from SQL -- for
@@ -346,7 +346,15 @@ print(db.products.find_one({"name": "Sprocket"}))</code></pre>
 
 <p>
   Everything above is a single <code>docker run</code> plus one <code>CREATE ROLE</code>
-  away. See the <a href="https://github.com/pglayers/pglayers">pglayers repository</a>
+  away. Pull the image and connect your favorite MongoDB client:
+</p>
+
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">10260:10260</span> \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:18</span></code></pre>
+
+<p>
+  See the <a href="https://github.com/pglayers/pglayers">pglayers repository</a>
   for the full extension list and profile documentation, and the
   <a href="https://github.com/documentdb/documentdb">DocumentDB project</a> for the
   supported MongoDB API surface.
@@ -417,20 +425,20 @@ print(db.products.find_one({"name": "Sprocket"}))</code></pre>
   files are laid out at exactly the paths PostgreSQL expects:
 </p>
 
-<pre><code>/usr/lib/postgresql/17/lib/vector.so
-/usr/share/postgresql/17/extension/vector.control
-/usr/share/postgresql/17/extension/vector--0.8.3.sql</code></pre>
+<pre><code><span class="token-path" style="color: #10b981">/usr/lib/postgresql/17/lib/vector.so</span>
+<span class="token-path" style="color: #10b981">/usr/share/postgresql/17/extension/vector.control</span>
+<span class="token-path" style="color: #10b981">/usr/share/postgresql/17/extension/vector--0.8.3.sql</span></code></pre>
 
 <p>
   To use them, you write a standard multi-stage <code>COPY --from</code> in your
   Dockerfile:
 </p>
 
-<pre><code>FROM postgres:17
+<pre><code><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:17</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:17  / /
-COPY --from=ghcr.io/pglayers/pgx-pg_cron:17   / /
-COPY --from=ghcr.io/pglayers/pgx-postgis:17   / /</code></pre>
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:17</span>  / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pg_cron:17</span>   / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-postgis:17</span>   / /</code></pre>
 
 <p>
   That's it. Docker pulls the pre-built layers from the registry and overlays
@@ -441,9 +449,9 @@ COPY --from=ghcr.io/pglayers/pgx-postgis:17   / /</code></pre>
 
 <p>Then you can <code>CREATE EXTENSION</code> as usual:</p>
 
-<pre><code>CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS pg_cron;
-CREATE EXTENSION IF NOT EXISTS postgis;</code></pre>
+<pre><code><span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> vector;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> pg_cron;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> postgis;</code></pre>
 
 <h2>Ready-to-use profile images</h2>
 
@@ -452,11 +460,11 @@ CREATE EXTENSION IF NOT EXISTS postgis;</code></pre>
   combined images called <strong>profiles</strong>:
 </p>
 
-<pre><code># All 50+ extensions, pre-configured
-docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-full:17
+<pre><code><span class="token-comment" style="color: #8888a0"># All 50+ extensions, pre-configured</span>
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:17</span>
 
-# Extensions matching Azure Database for PostgreSQL
-docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:17</code></pre>
+<span class="token-comment" style="color: #8888a0"># Extensions matching Azure Database for PostgreSQL</span>
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:17</span></code></pre>
 
 <p>
   Profile images come with <code>shared_preload_libraries</code> already
@@ -528,38 +536,38 @@ docker run -d -e POSTGRES_PASSWORD=secret ghcr.io/pglayers/pglayers-azure:17</co
   The fastest way to try pglayers is the full profile image:
 </p>
 
-<pre><code>docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret \
-  ghcr.io/pglayers/pglayers-full:17</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:17</span></code></pre>
 
 <p>
   Then connect and enable any extension:
 </p>
 
-<pre><code>psql -h localhost -U postgres
-CREATE EXTENSION vector;
-CREATE EXTENSION postgis;
-SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-h</span> localhost <span class="token-option" style="color: #818cf8">-U</span> postgres
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION</span> vector;
+<span class="token-keyword" style="color: #818cf8">CREATE EXTENSION</span> postgis;
+<span class="token-keyword" style="color: #818cf8">SELECT</span> <span class="token-string" style="color: #10b981">'[1,2,3]'</span>::vector <span class="token-operator" style="color: #818cf8">&lt;-&gt;</span> <span class="token-string" style="color: #10b981">'[4,5,6]'</span>::vector <span class="token-keyword" style="color: #818cf8">AS</span> distance;</code></pre>
 
 <p>
   To build a custom image with only the extensions you need, create a
   Dockerfile:
 </p>
 
-<pre><code>FROM postgres:17
+<pre><code><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:17</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:17       / /
-COPY --from=ghcr.io/pglayers/pgx-timescaledb:17    / /
-COPY --from=ghcr.io/pglayers/pgx-pg_cron:17        / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:17</span>       / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-timescaledb:17</span>    / /
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pg_cron:17</span>        / /
 
-RUN echo "shared_preload_libraries = 'timescaledb,pg_cron'" \
-    >> /usr/share/postgresql/postgresql.conf.sample</code></pre>
+<span class="token-keyword" style="color: #818cf8">RUN</span> <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"shared_preload_libraries = 'timescaledb,pg_cron'"</span> \
+    &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</code></pre>
 
 <p>
   Build and run:
 </p>
 
-<pre><code>docker build -t my-postgres .
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=secret my-postgres</code></pre>
+<pre><code><span class="token-command" style="color: #f59e0b">docker</span> build <span class="token-option" style="color: #818cf8">-t</span> my-postgres .
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d -p</span> <span class="token-number" style="color: #3b82f6">5432:5432</span> <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">secret</span> my-postgres</code></pre>
 
 <h2>Open source</h2>
 

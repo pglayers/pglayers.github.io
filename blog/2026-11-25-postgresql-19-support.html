@@ -318,20 +318,20 @@
 
 <p>The Full profile includes all 62 extensions currently available for PostgreSQL 19:</p>
 
-<pre><code class="language-sh">docker run -d --name pglayers-pg19 \
-  -e POSTGRES_PASSWORD=change-me \
-  -p 127.0.0.1:5432:5432 \
-  ghcr.io/pglayers/pglayers-full:19</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-pg19 \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
+  <span class="token-option" style="color: #818cf8">-p</span> <span class="token-number" style="color: #3b82f6">127.0.0.1:5432:5432</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-full:19</span></code></pre>
 
 <p>Once PostgreSQL is ready, connect with:</p>
 
-<pre><code class="language-sh">docker exec -it pglayers-pg19 psql -U postgres</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> exec <span class="token-option" style="color: #818cf8">-it</span> pglayers-pg19 <span class="token-command" style="color: #f59e0b">psql</span> <span class="token-option" style="color: #818cf8">-U</span> postgres</code></pre>
 
 <p>For example, enable pgvector and calculate a vector distance:</p>
 
-<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;
+<pre><code class="language-sql"><span class="token-keyword" style="color: #818cf8">CREATE EXTENSION IF NOT EXISTS</span> vector;
 
-SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+<span class="token-keyword" style="color: #818cf8">SELECT</span> <span class="token-string" style="color: #10b981">'[1,2,3]'</span>::vector <span class="token-operator" style="color: #818cf8">&lt;-&gt;</span> <span class="token-string" style="color: #10b981">'[4,5,6]'</span>::vector <span class="token-keyword" style="color: #818cf8">AS</span> distance;</code></pre>
 
 <p>The profile takes care of the server configuration. You still create the SQL extensions you want to use in each database.</p>
 
@@ -380,9 +380,9 @@ SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
 
 <p>If you want a smaller collection based on extensions available in Azure Database for PostgreSQL Flexible Server, use:</p>
 
-<pre><code class="language-sh">docker run -d --name pglayers-azure-pg19 \
-  -e POSTGRES_PASSWORD=change-me \
-  ghcr.io/pglayers/pglayers-azure:19</code></pre>
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> pglayers-azure-pg19 \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
+  <span class="token-string" style="color: #10b981">ghcr.io/pglayers/pglayers-azure:19</span></code></pre>
 
 <p>The PG19 Azure profile currently includes <strong>24 extensions</strong>, compared with <strong>31 on PG17 and PG18</strong>.</p>
 
@@ -408,22 +408,22 @@ SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
 
 <p>You do not have to use a profile. Here is a complete Dockerfile that adds only pgvector:</p>
 
-<pre><code class="language-dockerfile">FROM postgres:19
+<pre><code class="language-dockerfile"><span class="token-keyword" style="color: #818cf8">FROM</span> <span class="token-string" style="color: #10b981">postgres:19</span>
 
-COPY --from=ghcr.io/pglayers/pgx-pgvector:19 \
+<span class="token-keyword" style="color: #818cf8">COPY</span> <span class="token-option" style="color: #818cf8">--from=</span><span class="token-string" style="color: #10b981">ghcr.io/pglayers/pgx-pgvector:19</span> \
     / /extensions/pgvector/
 
-RUN echo "extension_control_path = '/extensions/pgvector/share:\$system'" \
+<span class="token-keyword" style="color: #818cf8">RUN</span> <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"extension_control_path = '/extensions/pgvector/share:\$system'"</span> \
         &gt;&gt; /usr/share/postgresql/postgresql.conf.sample \
-    &amp;&amp; echo "dynamic_library_path = '/extensions/pgvector/lib:\$libdir'" \
+    &amp;&amp; <span class="token-command" style="color: #f59e0b">echo</span> <span class="token-string" style="color: #10b981">"dynamic_library_path = '/extensions/pgvector/lib:\$libdir'"</span> \
         &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</code></pre>
 
 <p>Build and run it normally:</p>
 
-<pre><code class="language-sh">docker build -t my-postgres:19 .
+<pre><code class="language-sh"><span class="token-command" style="color: #f59e0b">docker</span> build <span class="token-option" style="color: #818cf8">-t</span> my-postgres:19 .
 
-docker run -d --name my-postgres \
-  -e POSTGRES_PASSWORD=change-me \
+<span class="token-command" style="color: #f59e0b">docker</span> run <span class="token-option" style="color: #818cf8">-d --name</span> my-postgres \
+  <span class="token-option" style="color: #818cf8">-e</span> POSTGRES_PASSWORD=<span class="token-string" style="color: #10b981">change-me</span> \
   my-postgres:19</code></pre>
 
 <p>No extension compilation happens during this build. Docker copies the prebuilt layer.</p>

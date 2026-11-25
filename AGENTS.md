@@ -18,6 +18,21 @@ no static site generator, no external packages.
 - **Consistent styling.** Blog pages reuse the same design language as
   `index.html` (dark theme, Inter + JetBrains Mono fonts, CSS variables
   defined in `:root`).
+- **Code blocks must be syntax-colored.** Every `<pre>` example must have
+  highlighted commands, keywords, strings, comments, or other meaningful
+  tokens. A `language-*` class alone is not highlighting. Inline identifiers
+  may retain the normal inline-code styling.
+  - Use static `<span class="token-..." style="color: ...">` markup for blog
+    blocks so colors also work in RSS readers without JavaScript or a site
+    stylesheet. Keep the matching full HTML in `feed.xml` synchronized.
+  - Match the site palette: commands `#f59e0b`, keywords/options/operators
+    `#818cf8`, strings/paths `#10b981`, numbers `#3b82f6`, comments `#8888a0`,
+    and error labels `#f87171`. The homepage's existing colored span classes
+    are also valid.
+  - Preserve the exact copyable code text, whitespace, quoting, and literal
+    `$` characters; escape HTML characters such as `<` and `&`.
+  - Do not add external highlighting packages or a build step. Run the static
+    site tests and check desktop/mobile rendering after changing snippets.
 - **Navigation bar must stay in sync across all pages.** The top nav is
   duplicated in `index.html`, `blog/index.html`, and every blog post.
   When changing nav links (adding, removing, or reordering), update all
