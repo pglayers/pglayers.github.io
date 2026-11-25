@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL 19 is now supported in pglayers - pglayers blog</title>
+    <meta name="description" content="PostgreSQL 19 support in pglayers: 62 extension layers, Full and Azure profiles, amd64 and arm64 images, and examples for getting started without compiling extensions.">
+    <link rel="alternate" type="application/rss+xml" title="pglayers blog" href="/feed.xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-card: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e4e4ed;
+            --text-muted: #8888a0;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --green: #10b981;
+            --blue: #3b82f6;
+            --orange: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-brand span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-links .btn-gh {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .nav-links .btn-gh:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        /* Article layout */
+        .article-container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .article-meta {
+            margin-bottom: 2rem;
+        }
+
+        .article-meta time,
+        .article-meta .author {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .article-container h1 {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .article-container h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .article-container p {
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .article-container a {
+            color: var(--accent-light);
+            text-decoration: underline;
+            text-decoration-color: rgba(129, 140, 248, 0.3);
+            text-underline-offset: 3px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .article-container a:hover {
+            text-decoration-color: var(--accent-light);
+        }
+
+        .article-container ul {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        .article-container li {
+            margin-bottom: 0.5rem;
+            line-height: 1.7;
+        }
+
+        .article-container code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            overflow-wrap: anywhere;
+        }
+
+        .article-container pre {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .article-container pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            overflow-wrap: normal;
+        }
+
+        .article-container strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .table-scroll:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: var(--bg-subtle);
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        thead th {
+            background: var(--bg-card);
+        }
+
+        tbody tr:last-child th,
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { gap: 1rem; }
+            .article-container { padding: 7rem 1.25rem 3rem; }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links a:not(.btn-gh) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand"><span>pglayers</span></a>
+        <div class="nav-links">
+            <a href="/#features">Features</a>
+            <a href="/#profiles">Profiles</a>
+            <a href="/#kubernetes">Kubernetes</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/pglayers/pglayers" class="btn-gh">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+
+    <article class="article-container">
+        <div class="article-meta">
+            <time datetime="2026-11-25">November 25, 2026</time>
+            &middot;
+            <span class="author">Ismaël Mejía (<a href="https://github.com/iemejia">@iemejia</a>)</span>
+        </div>
+
+        <h1>PostgreSQL 19 is now supported in pglayers</h1>
+
+        <div class="article-body" id="post-content">
+<p>PostgreSQL 19 support is now available in <strong>pglayers</strong>, with <strong>62 extension layers</strong>, ready-to-use <strong>Full and Azure profile images</strong>, and builds for both <strong>amd64 and arm64</strong>.</p>
+
+<p>The images use the official <code>postgres:19</code> GA image. If you want PostgreSQL 19 with pgvector, PostGIS, pg_cron, pg_textsearch, or pg_lake, you can get started without compiling extensions yourself.</p>
+
+<h2>A quick reminder: what is pglayers?</h2>
+
+<p>The official PostgreSQL Docker images provide a familiar starting point, but installing additional extensions often means adding package repositories, build tools, and compilation steps to your Dockerfile.</p>
+
+<p>pglayers publishes extensions as small, composable Docker image layers. You can copy individual layers onto an official PostgreSQL image, or use a preconfigured profile that already includes the extension paths, preload libraries, and startup settings.</p>
+
+<p>The idea is simple: <strong>choose your extensions without maintaining their build environments.</strong></p>
+
+<h2>Try PostgreSQL 19 with extensions</h2>
+
+<p>The Full profile includes all 62 extensions currently available for PostgreSQL 19:</p>
+
+<pre><code class="language-sh">docker run -d --name pglayers-pg19 \
+  -e POSTGRES_PASSWORD=change-me \
+  -p 127.0.0.1:5432:5432 \
+  ghcr.io/pglayers/pglayers-full:19</code></pre>
+
+<p>Once PostgreSQL is ready, connect with:</p>
+
+<pre><code class="language-sh">docker exec -it pglayers-pg19 psql -U postgres</code></pre>
+
+<p>For example, enable pgvector and calculate a vector distance:</p>
+
+<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;
+
+SELECT '[1,2,3]'::vector &lt;-&gt; '[4,5,6]'::vector AS distance;</code></pre>
+
+<p>The profile takes care of the server configuration. You still create the SQL extensions you want to use in each database.</p>
+
+<p>The PG19 collection includes tools for several kinds of workloads:</p>
+
+<ul>
+    <li><strong>AI and search:</strong> pgvector and pg_textsearch.</li>
+    <li><strong>Geospatial queries:</strong> PostGIS, pgRouting, and H3.</li>
+    <li><strong>Data lake access:</strong> pg_lake.</li>
+    <li><strong>Background work:</strong> pg_cron, pg_net, and pg_incremental.</li>
+    <li><strong>Application development:</strong> pgmq, temporal_tables, and PLV8.</li>
+    <li><strong>Data protection and observability:</strong> PostgreSQL Anonymizer, pgAudit, and pg_stat_monitor.</li>
+</ul>
+
+<h2>What is available on each PostgreSQL version?</h2>
+
+<p>The pglayers catalog now contains <strong>84 extensions</strong>, but that does not mean every image contains all 84.</p>
+
+<p>Availability depends on the PostgreSQL major version, upstream compatibility, published packages, and whether extensions can run together.</p>
+
+<div class="table-scroll" role="region" aria-label="Extension availability by PostgreSQL version" tabindex="0">
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">PostgreSQL</th>
+                <th scope="col">Individual extension layers</th>
+                <th scope="col">Full profile</th>
+                <th scope="col">Azure profile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><th scope="row">17</th><td>84</td><td>83</td><td>31</td></tr>
+            <tr><th scope="row">18</th><td>84</td><td>83</td><td>31</td></tr>
+            <tr><th scope="row">19</th><td>62</td><td>62</td><td>24</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<p>These counts reflect the published images as of November 20, 2026.</p>
+
+<p>Why do the PG17 and PG18 Full profiles contain 83 extensions rather than 84? They include <code>pg_duckdb</code> and deliberately exclude the conflicting <code>pg_lake</code> layer. Both remain available individually. On PG19, <code>pg_duckdb</code> is not yet available through our build path, and the Full profile includes <code>pg_lake</code>.</p>
+
+<p>“Full” means the broadest compatible collection for that PostgreSQL major—not a promise that every extension in the catalog can be loaded together.</p>
+
+<h2>The Azure profile also supports PG19</h2>
+
+<p>If you want a smaller collection based on extensions available in Azure Database for PostgreSQL Flexible Server, use:</p>
+
+<pre><code class="language-sh">docker run -d --name pglayers-azure-pg19 \
+  -e POSTGRES_PASSWORD=change-me \
+  ghcr.io/pglayers/pglayers-azure:19</code></pre>
+
+<p>The PG19 Azure profile currently includes <strong>24 extensions</strong>, compared with <strong>31 on PG17 and PG18</strong>.</p>
+
+<p>Seven profile members are not yet available in pglayers for PG19:</p>
+
+<ul>
+    <li><code>age</code></li>
+    <li><code>documentdb</code></li>
+    <li><code>pg_duckdb</code></li>
+    <li><code>pg_failover_slots</code></li>
+    <li><code>rum</code></li>
+    <li><code>tds_fdw</code></li>
+    <li><code>timescaledb</code></li>
+</ul>
+
+<p>The blockers differ. Some projects have PG19 compatibility changes under development or awaiting a release. Others still need compatible packages, container images, or supporting components.</p>
+
+<p><strong>DocumentDB users should stay on PG17 or PG18 for now.</strong> Although <code>pglayers-azure:19</code> exists, it does not include DocumentDB or its MongoDB-compatible gateway.</p>
+
+<p>As before, the Azure profile is a convenience for local development—not an exact reproduction of the managed service. Extension versions, configuration defaults, and platform-specific behavior can differ.</p>
+
+<h2>Compose a smaller PG19 image</h2>
+
+<p>You do not have to use a profile. Here is a complete Dockerfile that adds only pgvector:</p>
+
+<pre><code class="language-dockerfile">FROM postgres:19
+
+COPY --from=ghcr.io/pglayers/pgx-pgvector:19 \
+    / /extensions/pgvector/
+
+RUN echo "extension_control_path = '/extensions/pgvector/share:\$system'" \
+        &gt;&gt; /usr/share/postgresql/postgresql.conf.sample \
+    &amp;&amp; echo "dynamic_library_path = '/extensions/pgvector/lib:\$libdir'" \
+        &gt;&gt; /usr/share/postgresql/postgresql.conf.sample</code></pre>
+
+<p>Build and run it normally:</p>
+
+<pre><code class="language-sh">docker build -t my-postgres:19 .
+
+docker run -d --name my-postgres \
+  -e POSTGRES_PASSWORD=change-me \
+  my-postgres:19</code></pre>
+
+<p>No extension compilation happens during this build. Docker copies the prebuilt layer.</p>
+
+<p>Like PG18, PG19 uses pglayers’ <strong>isolated extension layout</strong>. Each extension lives under its own <code>/extensions/&lt;name&gt;/</code> directory. PostgreSQL discovers its control files through <code>extension_control_path</code> and its modules through <code>dynamic_library_path</code>.</p>
+
+<p>Bundled runtime libraries are kept private to each extension, avoiding file overwrites and accidental dependencies on neighboring layers. This isolation does not make inherently incompatible extensions compatible, so checking the documented conflicts still matters.</p>
+
+<h2>Tested beyond a successful build</h2>
+
+<p>An extension compiling successfully is only the first step.</p>
+
+<p>The PG19 release went through checks for:</p>
+
+<ul>
+    <li><strong>Self-containment:</strong> each layer resolves its runtime dependencies on the bare PostgreSQL image.</li>
+    <li><strong>Cross-layer isolation:</strong> extensions do not accidentally load a sibling layer’s bundled libraries.</li>
+    <li><strong>Loading and functionality:</strong> extensions load and pass their SQL integration tests.</li>
+    <li><strong>Profile startup:</strong> both PG19 profiles start without warnings or errors.</li>
+    <li><strong>Server health:</strong> tests detect backend and background-worker crashes.</li>
+    <li><strong>Multi-architecture builds:</strong> images are built for amd64 and arm64.</li>
+    <li><strong>Kubernetes integration:</strong> ImageVolume and CloudNativePG tests pass on PG19.</li>
+</ul>
+
+<p>The GA layers and both profiles are now published. PostgreSQL 17 and 18 remain supported and tested alongside 19.</p>
+
+<h2>A note about upgrading</h2>
+
+<p>Changing an image tag from <code>:18</code> to <code>:19</code> is <strong>not a database migration</strong>.</p>
+
+<p>Treat this as a PostgreSQL major-version upgrade: check that every extension your database uses is available on PG19, back up your data, and follow an appropriate upgrade procedure such as <code>pg_upgrade</code> or dump and restore.</p>
+
+<p>In particular, the smaller PG19 extension set means that some existing PG17/18 workloads should wait for upstream support before moving.</p>
+
+<h2>Get started</h2>
+
+<p>You can find the current counts and examples on the <a href="https://pglayers.github.io/#versions">pglayers website</a>, browse the <a href="https://github.com/pglayers/pglayers#available-extensions">extension catalog</a>, or read the <a href="https://github.com/pglayers/pglayers/blob/main/docs/pg19-evaluation.md">PG19 compatibility notes</a>.</p>
+
+<p>Whether you want a preconfigured development database or a small image with a few carefully chosen extensions, PostgreSQL 19 is now another supported starting point.</p>
+        </div>
+    </article>
+
+    <footer>
+        <p>pglayers is open source under the <a href="https://github.com/pglayers/pglayers/blob/main/LICENSE">MIT License</a>.</p>
+    </footer>
+</body>
+</html>
